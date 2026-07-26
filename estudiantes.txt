@@ -1,2 +1,7 @@
 E0001;33444555;Copito;Wojtasik
 E0002;32111222;Pimpon;Wojtasik
+E0003;40123456;Juan;Perez
+E0004;38987654;Maria;Gomez
+E0005;42111333;Carlos;Rodriguez
+E0006;35444555;Ana;Lopez
+E0007;39888999;Lucas;Martinez
