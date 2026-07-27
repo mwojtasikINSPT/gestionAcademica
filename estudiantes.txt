@@ -3,5 +3,6 @@ E0002;32111222;Pimpon;Wojtasik
 E0003;40123456;Juan;Perez
 E0004;38987654;Maria;Gomez
 E0005;42111333;Carlos;Rodriguez
-E0006;35444555;Ana;Lopez
+E0006;35444555;Mariana;Nannis
 E0007;39888999;Lucas;Martinez
+E0008;33256665;Lautaro;Martinez

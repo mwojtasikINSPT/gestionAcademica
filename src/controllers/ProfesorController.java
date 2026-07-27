@@ -47,7 +47,7 @@ public class ProfesorController {
 
     private void registrarProfesor() {
         ProfesorDTO datos = view.pedirDatosNuevoProfesor();
-        List<Profesor> listaActual = dao.obtenerTodos();
+        List<Profesor> listaActual = dao.obtenerRegistros();
         List<String> idsActuales = new ArrayList<>();
 
         for (Profesor p : listaActual) {
@@ -62,7 +62,7 @@ public class ProfesorController {
     }
 
     private void mostrarTodos() {
-        List<Profesor> entidades = dao.obtenerTodos();
+        List<Profesor> entidades = dao.obtenerRegistros();
         List<ProfesorDTO> dtos = new ArrayList<>();
         for (Profesor p : entidades) {
             dtos.add(new ProfesorDTO(p.getId(), p.getDni(), p.getNombre(), p.getApellido()));
@@ -72,7 +72,7 @@ public class ProfesorController {
 
     private void actualizarProfesor() {
         String id = view.pedirId();
-        List<Profesor> listaActual = dao.obtenerTodos();
+        List<Profesor> listaActual = dao.obtenerRegistros();
 
         if (!Validaciones.existeProfesor(listaActual, id)) {
             view.mostrarMensaje(Mensajes.ERROR_ID);
@@ -83,11 +83,9 @@ public class ProfesorController {
         ProfesorDTO datos = view.pedirDatosNuevoProfesor();
         Profesor profeModificado = new Profesor(id, datos.dni, datos.nombre, datos.apellido);
 
-        if (dao.actualizar(profeModificado)) {
-            view.mostrarMensaje(Mensajes.EXITO_ACTUALIZAR);
-        } else {
-            view.mostrarMensaje(Mensajes.ERROR_ACTUALIZAR);
-        }
+        dao.modificar(profeModificado);
+        view.mostrarMensaje(Mensajes.EXITO_ACTUALIZAR);
+
     }
 
     private void eliminarProfesor() {

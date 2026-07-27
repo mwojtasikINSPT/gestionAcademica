@@ -5,11 +5,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AsignacionDAO {
+public class AsignacionDAO implements ICrud<Asignacion, String> {
 
     private final String ARCHIVO = "asignaciones.txt";
 
-    public List<Asignacion> obtenerTodas() {
+    @Override
+    public List<Asignacion> obtenerRegistros() {
         List<Asignacion> asignaciones = new ArrayList<>();
         File file = new File(ARCHIVO);
         if (!file.exists()) {
@@ -41,15 +42,17 @@ public class AsignacionDAO {
         }
     }
 
+    @Override
     public void agregar(Asignacion asignacion) {
-        List<Asignacion> lista = obtenerTodas();
+        List<Asignacion> lista = obtenerRegistros();
         lista.add(asignacion);
         guardarTodas(lista);
     }
 
+    @Override
     public void modificar(Asignacion asignacionActual) {
         //Obtengo lista de todas las asignaciones
-        List<Asignacion> listaAsignaciones = obtenerTodas();
+        List<Asignacion> listaAsignaciones = obtenerRegistros();
 
         //Recorro lista para buscar si hay asignacion que coincida con id pasado
         for (int i = 0; i < listaAsignaciones.size(); i++) {
@@ -63,15 +66,35 @@ public class AsignacionDAO {
         }
     }
 
-    public boolean eliminar(String id) {
-        List<Asignacion> lista = obtenerTodas();
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getIdAsignacion().equals(id)) {
-                lista.remove(i);
-                guardarTodas(lista);
-                return true;
+    @Override
+    public Asignacion obtenerPorId(String id) {
+        // Recorremos la lista de asignaciones
+        for (Asignacion a : obtenerRegistros()) {
+            // Si el ID coincide, devolvemos el objeto completo
+            if (a.getIdAsignacion().equals(id)) {
+                return a;
             }
         }
+        // Si no lo encuentra, devuelve null
+        return null;
+    }
+
+    @Override
+    public boolean eliminar(String id) {
+        // 1. Verificamos si la asignación realmente existe
+        Asignacion asignacionAEliminar = obtenerPorId(id);
+
+        // 2. Si existe (no es null), procedemos a borrarla
+        if (asignacionAEliminar != null) {
+            List<Asignacion> lista = obtenerRegistros();
+
+            // Forma limpia de remover el objeto coincidente
+            lista.removeIf(a -> a.getIdAsignacion().equals(id));
+
+            guardarTodas(lista); // Guardamos los cambios
+            return true;         // Avisamos que fue un éxito
+        }
+        // 3. Si no existía, devolvemos false
         return false;
     }
 }

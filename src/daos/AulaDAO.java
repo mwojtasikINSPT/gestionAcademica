@@ -5,11 +5,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AulaDAO {
+public class AulaDAO implements ICrud<Aula, String> {
 
     private final String ARCHIVO = "aulas.txt";
 
-    public List<Aula> obtenerTodas() {
+    @Override
+    public List<Aula> obtenerRegistros() {
         List<Aula> aulas = new ArrayList<>();
         File file = new File(ARCHIVO);
         if (!file.exists()) {
@@ -42,40 +43,51 @@ public class AulaDAO {
         }
     }
 
+    @Override
     public void agregar(Aula aula) {
-        List<Aula> lista = obtenerTodas();
+        List<Aula> lista = obtenerRegistros();
         lista.add(aula);
         guardarTodas(lista);
     }
 
-    public boolean actualizar(Aula aulaModificada) {
-        List<Aula> lista = obtenerTodas();
+    @Override
+    public void modificar(Aula aulaModificada) {
+        List<Aula> lista = obtenerRegistros();
         for (int i = 0; i < lista.size(); i++) {
             if (lista.get(i).getCodigo().equals(aulaModificada.getCodigo())) {
                 lista.set(i, aulaModificada);
                 guardarTodas(lista);
-                return true;
+                return; // Corta la ejecución del método una vez que guarda
             }
         }
-        return false;
     }
 
-    public boolean eliminar(String codigo) {
-        List<Aula> lista = obtenerTodas();
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getCodigo().equals(codigo)) {
-                lista.remove(i);
-                guardarTodas(lista);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Aula obtenerPorCodigo(String codigo) {
-        return obtenerTodas().stream()
+    @Override
+    public Aula obtenerPorId(String codigo) {
+        return obtenerRegistros().stream()
                 .filter(a -> a.getCodigo().equals(codigo))
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public boolean eliminar(String codigo) {
+        // 1. Verificamos si el aula existe usando tu método con Streams
+        Aula aulaAEliminar = obtenerPorId(codigo);
+
+        // 2. Si la encuentra (no es null), procedemos a borrarla
+        if (aulaAEliminar != null) {
+            List<Aula> lista = obtenerRegistros();
+
+            // Removemos de la lista usando removeIf
+            lista.removeIf(a -> a.getCodigo().equals(codigo));
+
+            guardarTodas(lista); // Guardamos los cambios en el archivo
+            return true;         // Avisamos que fue un éxito
+        }
+
+        // 3. Si no existía, devolvemos false
+        return false;
+    }
+
 }

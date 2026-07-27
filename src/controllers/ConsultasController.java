@@ -54,8 +54,8 @@ public class ConsultasController {
 
     private void consultarEstudiantesConAula() {
         StringBuilder reporte = new StringBuilder("\n--- REPORTE: ESTUDIANTES Y SUS AULAS ---\n");
-        var inscripciones = inscripcionDAO.obtenerTodas();
-        var estudiantes = estudianteDAO.obtenerTodos();
+        var inscripciones = inscripcionDAO.obtenerRegistros();
+        var estudiantes = estudianteDAO.obtenerRegistros();
 
         if (inscripciones.isEmpty()) {
             reporte.append("No hay inscripciones registradas en el sistema.");
@@ -81,7 +81,7 @@ public class ConsultasController {
 
         // 1. Verificar si el profesor existe
         Profesor profesorEncontrado = null;
-        for (Profesor p : profesorDAO.obtenerTodos()) {
+        for (Profesor p : profesorDAO.obtenerRegistros()) {
             if (p.getId().equals(idProfesor)) {
                 profesorEncontrado = p;
                 break;
@@ -95,7 +95,7 @@ public class ConsultasController {
 
         // 2. Buscar qué aulas tiene asignadas este profesor
         List<String> aulasDelProfesor = new ArrayList<>();
-        for (Asignacion a : asignacionDAO.obtenerTodas()) {
+        for (Asignacion a : asignacionDAO.obtenerRegistros()) {
             if (a.getIdProfesor().equals(idProfesor)) {
                 aulasDelProfesor.add(a.getCodigoAula());
             }
@@ -110,10 +110,10 @@ public class ConsultasController {
         StringBuilder reporte = new StringBuilder("\n--- ESTUDIANTES A CARGO DE: " + profesorEncontrado.getNombre() + " " + profesorEncontrado.getApellido() + " ---\n");
         boolean hayEstudiantes = false;
 
-        for (Inscripcion ins : inscripcionDAO.obtenerTodas()) {
+        for (Inscripcion ins : inscripcionDAO.obtenerRegistros()) {
             if (aulasDelProfesor.contains(ins.getCodigoAula())) {
                 // Encontramos un estudiante en un aula del profesor, buscamos sus datos
-                for (Estudiante est : estudianteDAO.obtenerTodos()) {
+                for (Estudiante est : estudianteDAO.obtenerRegistros()) {
                     if (est.getId().equals(ins.getIdEstudiante())) {
                         reporte.append(" - ").append(est.getNombre()).append(" ").append(est.getApellido())
                                 .append(" (Aula: ").append(ins.getCodigoAula()).append(")\n");
@@ -130,13 +130,13 @@ public class ConsultasController {
 
         view.mostrarResultado(reporte.toString());
     }
-    
+
     private void consultarProfesorDeEstudiante() {
         String idEstudiante = view.pedirIdEstudiante();
-        
+
         // 1. Validar que el estudiante exista
         Estudiante estudianteEncontrado = null;
-        for (Estudiante e : estudianteDAO.obtenerTodos()) {
+        for (Estudiante e : estudianteDAO.obtenerRegistros()) {
             if (e.getId().equals(idEstudiante)) {
                 estudianteEncontrado = e;
                 break;
@@ -150,7 +150,7 @@ public class ConsultasController {
 
         // 2. Buscar en qué aula está inscripto el estudiante
         String codigoAulaInscripto = null;
-        for (Inscripcion i : inscripcionDAO.obtenerTodas()) {
+        for (Inscripcion i : inscripcionDAO.obtenerRegistros()) {
             if (i.getIdEstudiante().equals(idEstudiante)) {
                 codigoAulaInscripto = i.getCodigoAula();
                 break;
@@ -164,7 +164,7 @@ public class ConsultasController {
 
         // 3. Buscar qué profesor está asignado a esa aula
         String idProfesorAsignado = null;
-        for (Asignacion a : asignacionDAO.obtenerTodas()) {
+        for (Asignacion a : asignacionDAO.obtenerRegistros()) {
             if (a.getCodigoAula().equals(codigoAulaInscripto)) {
                 idProfesorAsignado = a.getIdProfesor();
                 break;
@@ -178,7 +178,7 @@ public class ConsultasController {
 
         // 4. Buscar los datos reales del profesor para mostrar su nombre
         Profesor profesorAsignado = null;
-        for (Profesor p : profesorDAO.obtenerTodos()) {
+        for (Profesor p : profesorDAO.obtenerRegistros()) {
             if (p.getId().equals(idProfesorAsignado)) {
                 profesorAsignado = p;
                 break;
@@ -189,10 +189,10 @@ public class ConsultasController {
         StringBuilder reporte = new StringBuilder("\n--- PROFESOR ASIGNADO AL ESTUDIANTE ---\n");
         reporte.append("Estudiante: ").append(estudianteEncontrado.getNombre()).append(" ").append(estudianteEncontrado.getApellido()).append("\n");
         reporte.append("Aula: ").append(codigoAulaInscripto).append("\n");
-        
+
         if (profesorAsignado != null) {
             reporte.append("Profesor a cargo: ").append(profesorAsignado.getNombre()).append(" ").append(profesorAsignado.getApellido())
-                   .append(" (ID: ").append(profesorAsignado.getId()).append(")\n");
+                    .append(" (ID: ").append(profesorAsignado.getId()).append(")\n");
         } else {
             reporte.append("Profesor a cargo: ID ").append(idProfesorAsignado).append(" (Datos no encontrados)\n");
         }

@@ -6,15 +6,19 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EstudianteDAO {
+public class EstudianteDAO implements ICrud<Estudiante, String> {
+
     private final String ARCHIVO = "estudiantes.txt";
 
     // Carga los estudiantes del archivo a la memoria
-    public List<Estudiante> obtenerTodos() {
+    @Override
+    public List<Estudiante> obtenerRegistros() {
         List<Estudiante> estudiantes = new ArrayList<>();
         File file = new File(ARCHIVO);
-        
-        if (!file.exists()) return estudiantes;
+
+        if (!file.exists()) {
+            return estudiantes;
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String linea;
@@ -44,35 +48,59 @@ public class EstudianteDAO {
     }
 
     // Agrega un estudiante nuevo y guarda
+    @Override
     public void agregar(Estudiante estudiante) {
-        List<Estudiante> lista = obtenerTodos();
+        List<Estudiante> lista = obtenerRegistros();
         lista.add(estudiante);
         guardarTodos(lista);
     }
-    
+
     // Actualiza un estudiante existente y guarda los cambios
-    public boolean actualizar(Estudiante estudianteModificado) {
-        List<Estudiante> lista = obtenerTodos();
+    @Override
+    public void modificar(Estudiante estudianteModificado) {
+        List<Estudiante> lista = obtenerRegistros();
         for (int i = 0; i < lista.size(); i++) {
             if (lista.get(i).getId().equals(estudianteModificado.getId())) {
                 lista.set(i, estudianteModificado); // Reemplazamos el viejo por el nuevo
                 guardarTodos(lista);
-                return true;
+                return;
             }
         }
-        return false;
+    }
+
+    // Busca un estudiante por su ID
+    @Override
+    public Estudiante obtenerPorId(String id) {
+        // Recorremos la lista de estudiantes
+        for (Estudiante e : obtenerRegistros()) {
+            // Si el ID coincide, devolvemos el objeto completo
+            if (e.getId().equals(id)) {
+                return e;
+            }
+        }
+        // Si termina de buscar y no está, devuelve null
+        return null;
     }
 
     // Elimina un estudiante por su ID
+    @Override
     public boolean eliminar(String id) {
-        List<Estudiante> lista = obtenerTodos();
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getId().equals(id)) {
-                lista.remove(i); // Lo quitamos de la lista
-                guardarTodos(lista);
-                return true;
-            }
+        //1. Busco x id
+        Estudiante estudianteAEliminar = obtenerPorId(id);
+
+        // 2. Si NO es null, significa que lo encontró y procedemos a borrarlo
+        if (estudianteAEliminar != null) {
+            List<Estudiante> lista = obtenerRegistros();
+
+            // Forma rápida de borrarlo (removeIf busca el ID y lo quita automáticamente)
+            lista.removeIf(e -> e.getId().equals(id));
+
+            guardarTodos(lista); // Guardamos los cambios
+            return true;         // Avisamos que fue un éxito
         }
+
+        // 3. Si era null (no existía), directamente devolvemos false
         return false;
     }
+
 }

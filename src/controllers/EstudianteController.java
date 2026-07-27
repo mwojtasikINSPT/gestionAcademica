@@ -20,8 +20,8 @@ public class EstudianteController {
     }
 
     public void iniciar() {
-        int opcion; 
-        do{
+        int opcion;
+        do {
             opcion = view.mostrarMenu();
             switch (opcion) {
                 case 1:
@@ -42,7 +42,7 @@ public class EstudianteController {
                 default:
                     view.mostrarMensaje(Mensajes.OPCION_INVALIDA);
             }
-        }while(opcion !=0);
+        } while (opcion != 0);
     }
 
     private void registrarEstudiante() {
@@ -50,7 +50,7 @@ public class EstudianteController {
         EstudianteDTO datos = view.pedirDatosNuevoEstudiante();
 
         // 2. Extraemos los IDs existentes para generar el nuevo
-        List<Estudiante> listaActual = dao.obtenerTodos();
+        List<Estudiante> listaActual = dao.obtenerRegistros();
         List<String> idsActuales = new ArrayList<>();
         for (Estudiante e : listaActual) {
             idsActuales.add(e.getId());
@@ -69,7 +69,7 @@ public class EstudianteController {
 
     private void mostrarTodos() {
         // 1. Pedimos al DAO las entidades
-        List<Estudiante> entidades = dao.obtenerTodos();
+        List<Estudiante> entidades = dao.obtenerRegistros();
 
         // 2. Las mapeamos a DTOs para mandarlas a la vista
         List<EstudianteDTO> dtos = new ArrayList<>();
@@ -83,7 +83,7 @@ public class EstudianteController {
 
     private void actualizarEstudiante() {
         String id = view.pedirId();
-        List<Estudiante> listaActual = dao.obtenerTodos();
+        List<Estudiante> listaActual = dao.obtenerRegistros();
 
         if (!Validaciones.existeEstudiante(listaActual, id)) {
             view.mostrarMensaje(Mensajes.ERROR_ID);
@@ -97,11 +97,9 @@ public class EstudianteController {
         // Creamos la entidad respetando el ID original, pero con los datos nuevos
         Estudiante estudianteModificado = new Estudiante(id, datos.dni, datos.nombre, datos.apellido);
 
-        if (dao.actualizar(estudianteModificado)) {
-            view.mostrarMensaje(Mensajes.EXITO_ACTUALIZAR);
-        } else {
-            view.mostrarMensaje(Mensajes.ERROR_ACTUALIZAR);
-        }
+        dao.modificar(estudianteModificado);
+        view.mostrarMensaje(Mensajes.EXITO_ACTUALIZAR);
+
     }
 
     private void eliminarEstudiante() {

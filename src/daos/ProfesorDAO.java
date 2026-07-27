@@ -5,13 +5,17 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfesorDAO {
+public class ProfesorDAO implements ICrud<Profesor, String> {
+
     private final String ARCHIVO = "profesores.txt";
 
-    public List<Profesor> obtenerTodos() {
+    @Override
+    public List<Profesor> obtenerRegistros() {
         List<Profesor> profesores = new ArrayList<>();
         File file = new File(ARCHIVO);
-        if (!file.exists()) return profesores;
+        if (!file.exists()) {
+            return profesores;
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String linea;
@@ -31,7 +35,7 @@ public class ProfesorDAO {
     public void guardarTodos(List<Profesor> profesores) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARCHIVO))) {
             for (Profesor prof : profesores) {
-                // Asumiendo que le agregaste el metodo toLineaArchivo() a la entidad Profesor
+                // Uso metodo toLineaArchivo() de la entidad Profesor
                 bw.write(prof.getId() + ";" + prof.getDni() + ";" + prof.getNombre() + ";" + prof.getApellido());
                 bw.newLine();
             }
@@ -40,33 +44,56 @@ public class ProfesorDAO {
         }
     }
 
+    @Override
     public void agregar(Profesor profesor) {
-        List<Profesor> lista = obtenerTodos();
+        List<Profesor> lista = obtenerRegistros();
         lista.add(profesor);
         guardarTodos(lista);
     }
 
-    public boolean actualizar(Profesor profeModificado) {
-        List<Profesor> lista = obtenerTodos();
+    @Override
+    public void modificar(Profesor profeModificado) {
+        List<Profesor> lista = obtenerRegistros();
         for (int i = 0; i < lista.size(); i++) {
             if (lista.get(i).getId().equals(profeModificado.getId())) {
                 lista.set(i, profeModificado);
                 guardarTodos(lista);
-                return true;
+                return; // Corta la ejecución del método una vez que guarda
             }
         }
+    }
+
+    @Override
+    public Profesor obtenerPorId(String id) {
+        // Recorremos la lista de profesores
+        for (Profesor profe : obtenerRegistros()) {
+            // Si el ID coincide, devolvemos el objeto completo
+            if (profe.getId().equals(id)) {
+                return profe;
+            }
+        }
+        // Si no lo encuentra, devuelve null
+        return null;
+    }
+
+    @Override
+    public boolean eliminar(String id) {
+        // 1. Verificamos si el profesor realmente existe 
+        Profesor profeAEliminar = obtenerPorId(id);
+
+        // 2. Si existe (no es null), procedemos a borrarlo
+        if (profeAEliminar != null) {
+            List<Profesor> lista = obtenerRegistros();
+
+            // Removemos de la lista de forma limpia usando removeIf
+            lista.removeIf(p -> p.getId().equals(id));
+
+            guardarTodos(lista); // Guardamos los cambios en el archivo
+            return true;         // Avisamos que la baja fue un éxito
+        }
+
+        // 3. Si no existía en la lista, devolvemos false
         return false;
     }
 
-    public boolean eliminar(String id) {
-        List<Profesor> lista = obtenerTodos();
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getId().equals(id)) {
-                lista.remove(i);
-                guardarTodos(lista);
-                return true;
-            }
-        }
-        return false;
-    }
 }
