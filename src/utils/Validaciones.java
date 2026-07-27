@@ -104,6 +104,12 @@ public class Validaciones {
         }
     }
     
-    
+    // Normaliza un texto para búsquedas (quita espacios extremos y lo pasa a mayúsculas)
+    public static String normalizarTexto(String texto) {
+        if (texto == null) {
+            return "";
+        }
+        return texto.trim().toUpperCase();
+    }
 
 }
