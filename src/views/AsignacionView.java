@@ -17,17 +17,18 @@ public class AsignacionView {
         return Validaciones.mostrarMenu(textoMenu, scanner);
     }
 
-    public String pedirIdAsignacion() {
+    public String pedirIdAsignacion() {       
         System.out.print("Ingrese el ID de la asignacion (ej. AS001): ");
-        return scanner.nextLine().trim();
+        String idAsignacion = scanner.nextLine();
+        return Validaciones.normalizarTexto(idAsignacion);
     }
 
     public AsignacionDTO pedirDatosNuevaAsignacion() {
-        System.out.print("Ingrese el ID del Profesor: ");
-        String idProfesor = scanner.nextLine().trim();
+        System.out.print("Ingrese el ID del Profesor (ej. P0090): ");
+        String idProfesor = Validaciones.normalizarTexto(scanner.nextLine());
         
-        System.out.print("Ingrese el Codigo del Aula: ");
-        String codigoAula = scanner.nextLine().trim();
+        System.out.print("Ingrese el Codigo del Aula (ej. A0200): ");
+        String codigoAula = Validaciones.normalizarTexto(scanner.nextLine());
         
         return new AsignacionDTO(null, idProfesor, codigoAula);
     }

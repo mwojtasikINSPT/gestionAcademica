@@ -24,7 +24,8 @@ public class EstudianteView {
 
     public String pedirId() {
         System.out.print("Ingrese el ID del estudiante (ej. E0001): ");
-        return scanner.nextLine().trim();
+        String idEstudiante = scanner.nextLine();
+        return Validaciones.normalizarTexto(idEstudiante);
     }
 
     public EstudianteDTO pedirDatosNuevoEstudiante() {

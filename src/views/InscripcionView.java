@@ -19,16 +19,19 @@ public class InscripcionView {
 
     public String pedirIdInscripcion() {
         System.out.print("Ingrese el ID de la inscripcion (ej. I0001): ");
-        return scanner.nextLine().trim();
+        String idInscripcion = scanner.nextLine();
+        return Validaciones.normalizarTexto(idInscripcion);
     }
 
     public InscripcionDTO pedirDatosNuevaInscripcion() {
         System.out.print("Ingrese el ID del Estudiante: ");
-        String idEstudiante = scanner.nextLine().trim();
-        
+        String idEstudiante = scanner.nextLine();
+        idEstudiante = Validaciones.normalizarTexto(idEstudiante);
+
         System.out.print("Ingrese el Codigo del Aula: ");
-        String codigoAula = scanner.nextLine().trim();
-        
+        String codigoAula = scanner.nextLine();
+        codigoAula = Validaciones.normalizarTexto(codigoAula);
+
         return new InscripcionDTO(null, idEstudiante, codigoAula);
     }
 

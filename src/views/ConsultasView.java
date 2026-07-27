@@ -18,12 +18,14 @@ public class ConsultasView {
 
     public String pedirIdProfesor() {
         System.out.print("Ingrese el ID del profesor a consultar: ");
-        return scanner.nextLine().trim();
+        String idProfesor = scanner.nextLine();
+        return Validaciones.normalizarTexto(idProfesor);
     }
 
     public String pedirIdEstudiante() {
         System.out.print("Ingrese el ID del estudiante a consultar: ");
-        return scanner.nextLine().trim();
+        String idEstudiante = scanner.nextLine();
+        return Validaciones.normalizarTexto(idEstudiante);
     }
 
     public void mostrarResultado(String resultado) {

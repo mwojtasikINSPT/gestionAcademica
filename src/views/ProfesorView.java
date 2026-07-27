@@ -20,7 +20,8 @@ public class ProfesorView {
 
     public String pedirId() {
         System.out.print("Ingrese el ID del profesor (ej. P0001): ");
-        return scanner.nextLine().trim();
+        String idProfesor = scanner.nextLine();
+        return Validaciones.normalizarTexto(idProfesor);
     }
 
     public ProfesorDTO pedirDatosNuevoProfesor() {

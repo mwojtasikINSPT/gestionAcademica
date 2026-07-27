@@ -20,7 +20,8 @@ public class AulaView {
 
     public String pedirCodigo() {
         System.out.print("Ingrese el codigo del aula (ej. A0001): ");
-        return scanner.nextLine().trim();
+        String codigoAula = scanner.nextLine();
+        return Validaciones.normalizarTexto(codigoAula);
     }
 
     public AulaDTO pedirDatosNuevaAula() {
