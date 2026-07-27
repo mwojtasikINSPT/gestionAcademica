@@ -58,4 +58,22 @@ public class InscripcionDAO {
         }
         return false;
     }
+
+        
+    public void modificar(Inscripcion inscripcionActual) {
+    // Obtenemos la lista de todas las inscripciones
+    List<Inscripcion> listaInscripciones = obtenerTodas();
+
+    // Recorremos la lista buscando la inscripción que coincida con el ID
+    for (int i = 0; i < listaInscripciones.size(); i++) {
+        if (listaInscripciones.get(i).getIdInscripcion().equals(inscripcionActual.getIdInscripcion())) {
+            // Cuando la encontramos, la reemplazamos por el objeto actualizado
+            listaInscripciones.set(i, inscripcionActual);
+            
+            guardarTodas(listaInscripciones);
+            
+            return; // Cortamos la ejecución porque ya terminamos el reemplazo
+        }
+    }
+}
 }

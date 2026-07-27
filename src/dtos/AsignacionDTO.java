@@ -10,6 +10,16 @@ public class AsignacionDTO {
         this.idProfesor = idProfesor;
         this.codigoAula = codigoAula;
     }
+
+    public String getIdProfesor() {
+        return idProfesor;
+    }
+
+    public String getCodigoAula() {
+        return codigoAula;
+    }
+    
+    
     
     @Override
     public String toString() {

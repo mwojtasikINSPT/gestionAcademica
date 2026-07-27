@@ -33,7 +33,7 @@ public class AppConfig {
         AulaController controllerAula = new AulaController(daoAula, viewAula);
         InscripcionController controllerInsc = new InscripcionController(daoInsc, viewInsc, daoEst, daoAula);
         AsignacionController controllerAsign = new AsignacionController(daoAsign, viewAsign, daoProf, daoAula);
-        ConsultasController controllerCons = new ConsultasController(consView, daoEst, daoProf, daoAula, daoInsc, daoAsign);
+        ConsultasController controllerCons = new ConsultasController(consView, daoEst, daoProf, daoInsc, daoAsign);
 
         // 3. Bucle del Menu Principal
         int opcion;

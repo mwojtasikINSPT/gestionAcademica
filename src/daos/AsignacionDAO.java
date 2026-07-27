@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AsignacionDAO {
+
     private final String ARCHIVO = "asignaciones.txt";
 
     public List<Asignacion> obtenerTodas() {
         List<Asignacion> asignaciones = new ArrayList<>();
         File file = new File(ARCHIVO);
-        if (!file.exists()) return asignaciones;
+        if (!file.exists()) {
+            return asignaciones;
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String linea;
@@ -42,6 +45,22 @@ public class AsignacionDAO {
         List<Asignacion> lista = obtenerTodas();
         lista.add(asignacion);
         guardarTodas(lista);
+    }
+
+    public void modificar(Asignacion asignacionActual) {
+        //Obtengo lista de todas las asignaciones
+        List<Asignacion> listaAsignaciones = obtenerTodas();
+
+        //Recorro lista para buscar si hay asignacion que coincida con id pasado
+        for (int i = 0; i < listaAsignaciones.size(); i++) {
+            if (listaAsignaciones.get(i).getIdAsignacion().equals(asignacionActual.getIdAsignacion())) {
+                //Si encuentro, reemplazo
+                listaAsignaciones.set(i, asignacionActual);
+                //Guardo
+                guardarTodas(listaAsignaciones);
+                return;
+            }
+        }
     }
 
     public boolean eliminar(String id) {

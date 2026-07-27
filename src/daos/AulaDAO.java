@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AulaDAO {
+
     private final String ARCHIVO = "aulas.txt";
 
     public List<Aula> obtenerTodas() {
         List<Aula> aulas = new ArrayList<>();
         File file = new File(ARCHIVO);
-        if (!file.exists()) return aulas;
+        if (!file.exists()) {
+            return aulas;
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String linea;
@@ -67,5 +70,12 @@ public class AulaDAO {
             }
         }
         return false;
+    }
+
+    public Aula obtenerPorCodigo(String codigo) {
+        return obtenerTodas().stream()
+                .filter(a -> a.getCodigo().equals(codigo))
+                .findFirst()
+                .orElse(null);
     }
 }

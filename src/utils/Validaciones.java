@@ -5,7 +5,8 @@ import models.Estudiante;
 import models.Profesor;
 import java.util.List;
 import java.util.Scanner;
-
+import models.Asignacion;
+import models.Inscripcion;
 
 public class Validaciones {
 
@@ -63,7 +64,7 @@ public class Validaciones {
         }
         return false;
     }
-    
+
     // Valida que el DNI tenga exactamente 8 numeros
     public static boolean esDniValido(String dni) {
         if (dni == null) {
@@ -72,7 +73,7 @@ public class Validaciones {
         // \\d significa "digito numerico", y {8} significa "exactamente 8 veces"
         return dni.matches("\\d{8}");
     }
-    
+
     // Valida que el texto no este vacio ni compuesto solo por espacios
     public static boolean esTextoValido(String texto) {
         if (texto == null) {
@@ -81,7 +82,7 @@ public class Validaciones {
         // trim() quita los espacios al principio y al final
         return !texto.trim().isEmpty();
     }
-    
+
     // Imprime un menu multilinea y devuelve la opcion elegida
     public static int mostrarMenu(String mensajeMenu, Scanner scanner) {
         System.out.println(mensajeMenu);
@@ -90,7 +91,7 @@ public class Validaciones {
         scanner.nextLine(); // Limpiar el buffer del teclado
         return opcion;
     }
-    
+
     // Valida que el texto ingresado sea un numero entero mayor a 0
     public static boolean esNumeroPositivo(String texto) {
         if (texto == null || texto.trim().isEmpty()) {
@@ -103,7 +104,7 @@ public class Validaciones {
             return false; // Si tiene letras, cae aca y devuelve falso
         }
     }
-    
+
     // Normaliza un texto para búsquedas (quita espacios extremos y lo pasa a mayúsculas)
     public static String normalizarTexto(String texto) {
         if (texto == null) {
@@ -112,4 +113,36 @@ public class Validaciones {
         return texto.trim().toUpperCase();
     }
 
+    // Valida si un profesor ya tiene un aula asignada
+    public static boolean profesorTieneAula(List<Asignacion> listaAsignaciones, String idProfesorBuscado) {
+        String idBuscado = normalizarTexto(idProfesorBuscado);
+        for (Asignacion asig : listaAsignaciones) {
+            if (normalizarTexto(asig.getIdProfesor()).equals(idBuscado)) {
+                return true; // El profesor ya está asignado
+            }
+        }
+        return false;
+    }
+
+    // Valida si el aula ya tiene un profesor asignado
+    public static boolean aulaOcupada(List<Asignacion> listaAsignaciones, String codigoAulaBuscado) {
+        String codigoBuscado = normalizarTexto(codigoAulaBuscado);
+        for (Asignacion asig : listaAsignaciones) {
+            if (normalizarTexto(asig.getCodigoAula()).equals(codigoBuscado)) {
+                return true; // El aula ya tiene profesor
+            }
+        }
+        return false;
+    }
+
+    // Valida si un estudiante ya está inscripto en alguna aula
+    public static boolean estudianteInscripto(List<Inscripcion> listaInscripciones, String idEstudianteBuscado) {
+        String idBuscado = normalizarTexto(idEstudianteBuscado);
+        for (Inscripcion insc : listaInscripciones) {
+            if (normalizarTexto(insc.getIdEstudiante()).equals(idBuscado)) {
+                return true; // El estudiante ya tiene un aula asignada
+            }
+        }
+        return false;
+    }
 }

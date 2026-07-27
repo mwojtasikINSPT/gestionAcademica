@@ -20,4 +20,7 @@ public class MainView {
         return Validaciones.mostrarMenu(menu, scanner);
     }
 
+    public void mostrarMensaje(String mensaje) {
+        System.out.println("-> " + mensaje);
+    }
 }

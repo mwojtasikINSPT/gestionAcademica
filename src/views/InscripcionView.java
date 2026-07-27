@@ -6,14 +6,16 @@ import java.util.List;
 import java.util.Scanner;
 
 public class InscripcionView {
+
     private Scanner scanner = new Scanner(System.in);
 
     public int mostrarMenu() {
-        String textoMenu = "\n--- GESTION DE INSCRIPCIONES ---\n" +
-                           "1. Asignar estudiante a un aula\n" +
-                           "2. Ver todas las inscripciones\n" +
-                           "3. Eliminar inscripcion\n" +
-                           "0. Volver al menu principal";
+        String textoMenu = "\n--- GESTION DE INSCRIPCIONES ---\n"
+                + "1. Asignar estudiante a un aula\n"
+                + "2. Ver todas las inscripciones\n"
+                + "3. Modificar inscripcion\n"
+                + "4. Eliminar inscripcion\n"
+                + "0. Volver al menu principal";
         return Validaciones.mostrarMenu(textoMenu, scanner);
     }
 
@@ -48,5 +50,11 @@ public class InscripcionView {
 
     public void mostrarMensaje(String mensaje) {
         System.out.println("-> " + mensaje);
+    }
+
+    public String pedirNuevoCodigoAula() {
+        System.out.print("Ingrese el codigo de la nueva aula (ej. A0926): ");
+        String nuevoCodigo = scanner.nextLine();
+        return Validaciones.normalizarTexto(nuevoCodigo);
     }
 }

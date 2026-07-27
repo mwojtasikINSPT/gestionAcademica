@@ -3,7 +3,6 @@ package controllers;
 import daos.AsignacionDAO;
 import daos.EstudianteDAO;
 import daos.InscripcionDAO;
-import daos.AulaDAO;
 import daos.ProfesorDAO;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,15 +18,13 @@ public class ConsultasController {
     private final ConsultasView view;
     private final EstudianteDAO estudianteDAO;
     private final ProfesorDAO profesorDAO;
-    private final AulaDAO aulaDAO;
     private final InscripcionDAO inscripcionDAO;
     private final AsignacionDAO asignacionDAO;
 
-    public ConsultasController(ConsultasView view, EstudianteDAO estDao, ProfesorDAO profDao, AulaDAO aulaDao, InscripcionDAO insDao, AsignacionDAO asigDao) {
+    public ConsultasController(ConsultasView view, EstudianteDAO estDao, ProfesorDAO profDao, InscripcionDAO insDao, AsignacionDAO asigDao) {
         this.view = view;
         this.estudianteDAO = estDao;
         this.profesorDAO = profDao;
-        this.aulaDAO = aulaDao;
         this.inscripcionDAO = insDao;
         this.asignacionDAO = asigDao;
     }
@@ -165,11 +162,11 @@ public class ConsultasController {
             return;
         }
 
-        // 3. Buscar qué profesor está asignado a esa aula (aquí usamos el aulaDAO o recorremos asignaciones)
+        // 3. Buscar qué profesor está asignado a esa aula
         String idProfesorAsignado = null;
         for (Asignacion a : asignacionDAO.obtenerTodas()) {
             if (a.getCodigoAula().equals(codigoAulaInscripto)) {
-                idProfesorAsignado = idProfesorAsignado = a.getIdProfesor();
+                idProfesorAsignado = a.getIdProfesor();
                 break;
             }
         }
