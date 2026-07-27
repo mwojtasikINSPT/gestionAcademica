@@ -7,6 +7,9 @@ import java.util.List;
 
 public class AulaDAO implements ICrud<Aula, String> {
 
+    AsignacionDAO asignacionDAO = new AsignacionDAO();
+    InscripcionDAO inscripcionDAO = new InscripcionDAO();
+
     private final String ARCHIVO = "aulas.txt";
 
     @Override
@@ -70,7 +73,8 @@ public class AulaDAO implements ICrud<Aula, String> {
                 .orElse(null);
     }
 
-    @Override
+   
+    /* 
     public boolean eliminar(String codigo) {
         // 1. Verificamos si el aula existe usando tu método con Streams
         Aula aulaAEliminar = obtenerPorId(codigo);
@@ -89,5 +93,39 @@ public class AulaDAO implements ICrud<Aula, String> {
         // 3. Si no existía, devolvemos false
         return false;
     }
+    */
+
+    @Override
+    public boolean eliminar(String codigo) {
+
+    // 1. Chequeamos si el aula está en alguna Asignación (si tiene profesor)
+    boolean enUsoPorProfesor = asignacionDAO.obtenerRegistros().stream()
+            .anyMatch(a -> a.getCodigoAula().equals(codigo));
+
+    // 2. Chequeamos si el aula está en alguna Inscripción (si tiene alumnos)
+    boolean enUsoPorAlumnos = inscripcionDAO.obtenerRegistros().stream()
+            .anyMatch(i -> i.getCodigoAula().equals(codigo));
+
+    // 3. Si está en uso, informamos y abortamos devolviendo false
+    if (enUsoPorProfesor || enUsoPorAlumnos) {
+        System.out.println("ERROR: No se puede eliminar el aula porque tiene un profesor o alumnos asignados.");
+        return false; 
+    }
+
+    // 4. Si el aula está "limpia", procedemos con la lógica de eliminación normal
+    Aula aulaAEliminar = obtenerPorId(codigo);
+
+    if (aulaAEliminar != null) {
+        List<Aula> lista = obtenerRegistros();
+        
+        lista.removeIf(a -> a.getCodigo().equals(codigo));
+        guardarTodas(lista); 
+        
+        return true; // Éxito al eliminar
+    }
+
+    // 5. Si no se encontró el aula original
+    return false;
+}   
 
 }

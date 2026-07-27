@@ -85,6 +85,15 @@ public class EstudianteDAO implements ICrud<Estudiante, String> {
     // Elimina un estudiante por su ID
     @Override
     public boolean eliminar(String id) {
+        InscripcionDAO inscripcionDAO = new InscripcionDAO();
+        // Chequeamos si el estudiante está inscripto en alguna materia/aula
+        boolean enUso = inscripcionDAO.obtenerRegistros().stream()
+                .anyMatch(i -> i.getIdEstudiante().equals(id));
+
+        if (enUso) {
+            System.out.println("ERROR: No se puede eliminar el estudiante porque esta inscripto en un aula.");
+            return false;
+        }
         //1. Busco x id
         Estudiante estudianteAEliminar = obtenerPorId(id);
 

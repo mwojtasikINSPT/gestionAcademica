@@ -90,10 +90,22 @@ public class ProfesorController {
 
     private void eliminarProfesor() {
         String id = view.pedirId();
-        if (dao.eliminar(id)) {
-            view.mostrarMensaje(Mensajes.EXITO_ELIMINAR);
-        } else {
+
+        // 1. Primero verificamos si el profesor existe usando el obtenerPorId
+        Profesor profe = dao.obtenerPorId(id);
+
+        if (profe == null) {
+            // Si es null, mostramos el error de que no se encontró
             view.mostrarMensaje(Mensajes.ERROR_ID);
+        } else {
+            // 2. Si existe, le decimos al DAO que intente eliminarlo.
+            // Si está asignado, el DAO va a frenarlo, imprimir su propio mensaje y devolver false.
+            boolean eliminado = dao.eliminar(id);
+
+            // 3. Solo si el DAO logró eliminarlo de verdad (true), mostramos el éxito
+            if (eliminado) {
+                view.mostrarMensaje(Mensajes.EXITO_ELIMINAR);
+            }
         }
     }
 }

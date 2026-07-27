@@ -52,8 +52,6 @@ public class AsignacionView {
         return Validaciones.normalizarTexto(nuevoCodigo);
     }
 
-   
-    
     public void mostrarMensaje(String mensaje) {
         System.out.println("-> " + mensaje);
     }

@@ -105,11 +105,20 @@ public class EstudianteController {
     private void eliminarEstudiante() {
         String id = view.pedirId();
 
-        // El DAO ya nos devuelve true si lo elimino o false si no lo encontro
-        if (dao.eliminar(id)) {
-            view.mostrarMensaje(Mensajes.EXITO_ELIMINAR);
-        } else {
+        // 1. Primero verificamos si el estudiante existe usando el obtenerPorId
+        Estudiante est = dao.obtenerPorId(id);
+
+        if (est == null) {
             view.mostrarMensaje(Mensajes.ERROR_ID);
+        } else {
+            // 2. Si existe, le decimos al DAO que intente eliminarlo.
+            // Si está asignado, el DAO va a frenarlo, imprimir su propio mensaje y devolver false.
+            boolean eliminado = dao.eliminar(id);
+
+            // 3. Solo si el DAO logró eliminarlo de verdad (true), mostramos el éxito
+            if (eliminado) {
+                view.mostrarMensaje(Mensajes.EXITO_ELIMINAR);
+            }
         }
     }
 }

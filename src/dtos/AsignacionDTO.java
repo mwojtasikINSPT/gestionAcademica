@@ -1,6 +1,7 @@
 package dtos;
 
 public class AsignacionDTO {
+
     public String idAsignacion;
     public String idProfesor;
     public String codigoAula;
@@ -18,9 +19,7 @@ public class AsignacionDTO {
     public String getCodigoAula() {
         return codigoAula;
     }
-    
-    
-    
+
     @Override
     public String toString() {
         return "Asignacion: " + idAsignacion + " | Profesor ID: " + idProfesor + " | Aula Codigo: " + codigoAula;

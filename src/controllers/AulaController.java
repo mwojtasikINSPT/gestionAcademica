@@ -90,10 +90,29 @@ public class AulaController {
 
     private void eliminarAula() {
         String codigo = view.pedirCodigo();
+        /*
         if (dao.eliminar(codigo)) {
             view.mostrarMensaje(Mensajes.EXITO_ELIMINAR);
         } else {
             view.mostrarMensaje(Mensajes.ERROR_ID);
+    }
+         */
+        // 1. Verificamos si el aula existe 
+        Aula aula = dao.obtenerPorId(codigo);
+
+        if (aula == null) {
+            // Si es null, cortamos acá y damos el error real de que no existe
+            System.out.println("-> Error: No se encontro el ID ingresado.");
+        } else {
+            // 2. Si existe, intentamos eliminarla. 
+            // Si está en uso, el DAO va a imprimir su propio mensaje de error y devolver false.
+            boolean eliminada = dao.eliminar(codigo);
+
+            // 3. Si devolvió true, avisamos que salió todo bien.
+            if (eliminada) {
+                System.out.println("Aula eliminada con éxito.");
+            }
         }
+
     }
 }

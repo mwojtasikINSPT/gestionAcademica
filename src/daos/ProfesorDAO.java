@@ -78,10 +78,22 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
 
     @Override
     public boolean eliminar(String id) {
-        // 1. Verificamos si el profesor realmente existe 
+        // 1. Instanciamos el DAO que necesitamos consultar
+        AsignacionDAO asignacionDAO = new AsignacionDAO();
+
+        // 2. Chequeamos si el profesor está asignado a un aula
+        boolean enUso = asignacionDAO.obtenerRegistros().stream()
+                .anyMatch(a -> a.getIdProfesor().equals(id));
+
+        if (enUso) {
+            System.out.println("ERROR: No se puede eliminar el profesor porque tiene un aula asignada.");
+            return false;
+        }
+
+        // 3. Verificamos si el profesor realmente existe 
         Profesor profeAEliminar = obtenerPorId(id);
 
-        // 2. Si existe (no es null), procedemos a borrarlo
+        // 4. Si existe (no es null), procedemos a borrarlo
         if (profeAEliminar != null) {
             List<Profesor> lista = obtenerRegistros();
 
@@ -92,7 +104,7 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
             return true;         // Avisamos que la baja fue un éxito
         }
 
-        // 3. Si no existía en la lista, devolvemos false
+        // 5. Si no existía en la lista, devolvemos false
         return false;
     }
 
