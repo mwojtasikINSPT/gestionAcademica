@@ -11,7 +11,6 @@ import views.InscripcionView;
 import java.util.ArrayList;
 import java.util.List;
 import models.Aula;
-import utils.Mostrar;
 
 public class InscripcionController {
 
@@ -28,52 +27,26 @@ public class InscripcionController {
         this.aulaDAO = aulaDao;
     }
 
-    public void iniciar() {
-        int opcion;
-        do {
-            opcion = view.mostrarMenu();
-            switch (opcion) {
-                case 1:
-                    registrarInscripcion();
-                    break;
-                case 2:
-                    mostrarTodas();
-                    break;
-                case 3:
-                    modificarInscripcion();
-                    break;
-                case 4:
-                    eliminarInscripcion();
-                    break;
-                case 0:
-                    view.mostrarMensaje(Mensajes.VOLVIENDO);
-                    break;
-                default:
-                    view.mostrarMensaje(Mensajes.OPCION_INVALIDA);
-            }
-        } while (opcion != 0);
-    }
-
-    private void registrarInscripcion() {
+    public void registrarInscripcion() {
         InscripcionDTO datos = view.pedirDatosNuevaInscripcion();
 
         try {
             // 1. Validar que el estudiante exista
             if (!Validaciones.existeEstudiante(estudianteDAO.obtenerRegistros(), datos.getIdEstudiante())) {
-                view.mostrarMensaje(Mensajes.ERROR_ID);
+                view.mostrar(Mensajes.ERROR_ID);
                 return;
             }
             // 2. Buscar el aula y validar que exista
             Aula aulaDestino = aulaDAO.obtenerPorId(datos.getCodigoAula());
             if (aulaDestino == null) {
-                view.mostrarMensaje(Mensajes.ERROR_NO_ENCONTRADO);
+                view.mostrar(Mensajes.ERROR_ID);
                 return;
             }
 
             // 3. Validar la capacidad especifica de esa aula
             int ocupacionActual = contarInscriptos(datos.getCodigoAula());
             if (ocupacionActual >= aulaDestino.getCapacidad()) {
-                view.mostrarMensaje("Error: El aula " + datos.getCodigoAula() + " esta llena. Capacidad maxima: " + aulaDestino.getCapacidad());
+                view.mostrar("Error: El aula " + datos.getCodigoAula() + " esta llena. Capacidad maxima: " + aulaDestino.getCapacidad());
                 return;
             }
 
@@ -81,7 +54,7 @@ public class InscripcionController {
             List<Inscripcion> listaActual = dao.obtenerRegistros();
             // 5. Validar si el estudiante ya está inscripto
             if (Validaciones.estudianteInscripto(listaActual, datos.getIdEstudiante())) {
-                view.mostrarMensaje("Error: El estudiante ya se encuentra inscripto en un aula.");
+                view.mostrar("Error: El estudiante ya se encuentra inscripto en un aula.");
                 return;
             }
 
@@ -94,14 +67,13 @@ public class InscripcionController {
             Inscripcion nuevaInscripcion = new Inscripcion(nuevoId, datos.getIdEstudiante(), datos.getCodigoAula());
 
             dao.agregar(nuevaInscripcion);
-            view.mostrarMensaje(Mensajes.EXITO_GUARDAR + " (ID: " + nuevoId + ")");
+            view.mostrar(Mensajes.EXITO_GUARDAR + " (ID: " + nuevoId + ")");
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.EXITO_ACTUALIZAR);
+            view.mostrar(Mensajes.ERROR_GUARDAR);
         }
-
     }
 
-    private void mostrarTodas() {
+    public void mostrarTodas() {
         try {
             List<Inscripcion> entidades = dao.obtenerRegistros();
             List<InscripcionDTO> dtos = new ArrayList<>();
@@ -110,22 +82,20 @@ public class InscripcionController {
             }
             view.mostrarInscripciones(dtos);
         } catch (RuntimeException e) {
-            {
-                Mostrar.Mensaje(Mensajes.ERROR_LECTURA);
-            }
+            view.mostrar(Mensajes.ERROR_LECTURA);
         }
     }
 
-    private void eliminarInscripcion() {
+    public void eliminarInscripcion() {
         String id = view.pedirIdInscripcion();
         try {
             if (dao.eliminar(id)) {
-                view.mostrarMensaje(Mensajes.EXITO_ELIMINAR);
+                view.mostrar(Mensajes.EXITO_ELIMINAR);
             } else {
-                view.mostrarMensaje(Mensajes.ERROR_NO_ENCONTRADO);
+                view.mostrar(Mensajes.ERROR_ID);
             }
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.ERROR_ELIMINAR);
+            view.mostrar(Mensajes.ERROR_ELIMINAR);
         }
     }
 
@@ -135,7 +105,7 @@ public class InscripcionController {
                 .count();
     }
 
-    private void modificarInscripcion() {
+    public void modificarInscripcion() {
         // 1. Pedir el ID de la inscripción que queremos modificar
         String idInscripcion = view.pedirIdInscripcion();
 
@@ -144,7 +114,7 @@ public class InscripcionController {
             Inscripcion inscripcionActual = dao.obtenerPorId(idInscripcion);
 
             if (inscripcionActual == null) {
-                view.mostrarMensaje("Error: No se encontro ninguna inscripcion con el ID " + idInscripcion);
+                view.mostrar(Mensajes.ERROR_ID);
                 return;
             }
 
@@ -153,21 +123,21 @@ public class InscripcionController {
 
             // 4. Validar que no lo estemos mandando a la misma aula donde ya está
             if (inscripcionActual.getCodigoAula().equals(nuevoCodigoAula)) {
-                view.mostrarMensaje("El alumno ya se encuentra inscripto en esa aula. No hay cambios.");
+                view.mostrar("El alumno ya se encuentra inscripto en esa aula. No hay cambios.");
                 return;
             }
 
             // 5. Validar que la NUEVA aula exista
             Aula nuevaAula = aulaDAO.obtenerPorId(nuevoCodigoAula);
             if (nuevaAula == null) {
-                view.mostrarMensaje(Mensajes.ERROR_NO_ENCONTRADO);
+                view.mostrar(Mensajes.ERROR_ID);
                 return;
             }
 
             // 6. Validar que la NUEVA aula tenga lugar
             int ocupacionActual = contarInscriptos(nuevoCodigoAula);
             if (ocupacionActual >= nuevaAula.getCapacidad()) {
-                view.mostrarMensaje("Error: El aula destino " + nuevoCodigoAula + " esta llena. Capacidad maxima: " + nuevaAula.getCapacidad());
+                view.mostrar("Error: El aula destino " + nuevoCodigoAula + " esta llena. Capacidad maxima: " + nuevaAula.getCapacidad());
                 return;
             }
 
@@ -176,10 +146,9 @@ public class InscripcionController {
 
             dao.modificar(inscripcionActual);
 
-            view.mostrarMensaje("Exito! El estudiante fue reasignado al aula " + nuevoCodigoAula);
+            view.mostrar(Mensajes.EXITO_ACTUALIZAR);
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.ERROR_ACTUALIZAR);
+            view.mostrar(Mensajes.ERROR_ACTUALIZAR);
         }
-
     }
 }

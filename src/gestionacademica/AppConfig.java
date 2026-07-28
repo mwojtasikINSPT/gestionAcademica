@@ -41,7 +41,8 @@ public class AppConfig {
         ProfesorMenu profesorMenu = new ProfesorMenu(controllerProf, viewProf);
         EstudianteMenu estudianteMenu = new EstudianteMenu(controllerEst, viewEst);
         AsignacionMenu asignacionMenu = new AsignacionMenu(controllerAsign, viewAsign);
-
+        InscripcionMenu inscripcionMenu = new InscripcionMenu(controllerInsc, viewInsc);
+        
         // 3. Bucle del Menu Principal
         int opcion;
         do {
@@ -55,7 +56,7 @@ public class AppConfig {
                 case 3 ->
                     aulaMenu.iniciar();
                 case 4 ->
-                    controllerInsc.iniciar();
+                    inscripcionMenu.iniciar();
                 case 5 ->
                     asignacionMenu.iniciar();
                 case 6 ->

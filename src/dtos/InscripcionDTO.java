@@ -23,10 +23,4 @@ public class InscripcionDTO {
         return codigoAula;
     }
    
-    
-    
-    @Override
-    public String toString() {
-        return "Inscripcion: " + idInscripcion + " | Estudiante ID: " + idEstudiante + " | Aula Codigo: " + codigoAula;
-    }
 }
