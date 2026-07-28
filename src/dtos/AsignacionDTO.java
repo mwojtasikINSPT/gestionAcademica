@@ -20,8 +20,8 @@ public class AsignacionDTO {
         return codigoAula;
     }
 
-    @Override
-    public String toString() {
-        return "Asignacion: " + idAsignacion + " | Profesor ID: " + idProfesor + " | Aula Codigo: " + codigoAula;
+    public String getIdAsignacion() {
+        return idAsignacion;
     }
+
 }
