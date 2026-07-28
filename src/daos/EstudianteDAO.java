@@ -8,7 +8,7 @@ import java.util.List;
 public class EstudianteDAO implements ICrud<Estudiante, String> {
 
     private final String ARCHIVO = "estudiantes.txt";
-    
+
     // Aisla la logica del archivo. Si el archivo no existe, lo crea
     @Override
     public List<Estudiante> obtenerRegistros() {
@@ -29,7 +29,7 @@ public class EstudianteDAO implements ICrud<Estudiante, String> {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error al leer el archivo", e );
+            throw new RuntimeException("Error al leer el archivo", e);
         }
         return estudiantes;
     }
@@ -38,11 +38,11 @@ public class EstudianteDAO implements ICrud<Estudiante, String> {
     public void guardarTodos(List<Estudiante> estudiantes) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARCHIVO))) {
             for (Estudiante est : estudiantes) {
-                bw.write(est.toLineaArchivo());
+                bw.write(est.getId() + ";" + est.getDni() + ";" + est.getNombre() + ";" + est.getApellido());
                 bw.newLine();
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error al guardar", e );
+            throw new RuntimeException("Error al guardar", e);
         }
     }
 
@@ -84,29 +84,14 @@ public class EstudianteDAO implements ICrud<Estudiante, String> {
     // Elimina un estudiante por su ID
     @Override
     public boolean eliminar(String id) {
-        InscripcionDAO inscripcionDAO = new InscripcionDAO();
-        // Chequeamos si el estudiante está inscripto en alguna materia/aula
-        boolean enUso = inscripcionDAO.obtenerRegistros().stream()
-                .anyMatch(i -> i.getIdEstudiante().equals(id));
+        List<Estudiante> lista = obtenerRegistros();
+        // removeIf devuelve true si eliminó algo, false si no lo encontró
+        boolean eliminado = lista.removeIf(e -> e.getId().equals(id));
 
-        if (enUso) {
-            return false;
+        if (eliminado) {
+            guardarTodos(lista);
         }
-        //1. Busco x id
-        Estudiante estudianteAEliminar = obtenerPorId(id);
-
-        // 2. Si NO es null, significa que lo encontró y procedemos a borrarlo
-        if (estudianteAEliminar != null) {
-            List<Estudiante> lista = obtenerRegistros();
-
-            // Forma rápida de borrarlo (removeIf busca el ID y lo quita automáticamente)
-            lista.removeIf(e -> e.getId().equals(id));
-
-            guardarTodos(lista); // Guardamos los cambios
-            return true;         // Avisamos que fue un éxito
-        }
-        // 3. Si era null (no existía), directamente devolvemos false
-        return false;
+        return eliminado;
     }
 
 }

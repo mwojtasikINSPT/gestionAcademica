@@ -6,7 +6,6 @@ import models.Estudiante;
 import java.util.ArrayList;
 import java.util.List;
 import utils.Mensajes;
-import utils.Mostrar;
 import utils.Validaciones;
 import views.EstudianteView;
 
@@ -20,28 +19,7 @@ public class EstudianteController {
         this.view = view;
     }
 
-    public void iniciar() {
-        int opcion;
-        do {
-            opcion = view.mostrarMenu();
-            switch (opcion) {
-                case 1 ->
-                    registrarEstudiante();
-                case 2 ->
-                    mostrarTodos();
-                case 3 ->
-                    actualizarEstudiante();
-                case 4 ->
-                    eliminarEstudiante();
-                case 0 ->
-                    Mostrar.Mensaje(Mensajes.VOLVIENDO);
-                default ->
-                    Mostrar.Mensaje(Mensajes.OPCION_INVALIDA);
-            }
-        } while (opcion != 0);
-    }
-
-    private void registrarEstudiante() {
+    public void registrarEstudiante() {
 
         // 1. La vista nos da los datos base en un DTO
         EstudianteDTO datos = view.pedirDatosNuevoEstudiante();
@@ -62,31 +40,30 @@ public class EstudianteController {
 
             // 5. Guardamos mediante el DAO
             dao.agregar(nuevoEstudiante);
-            Mostrar.Mensaje(Mensajes.EXITO_GUARDAR);
+            view.mostrar(Mensajes.EXITO_GUARDAR);
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.ERROR_GUARDAR);
+            view.mostrar(Mensajes.ERROR_GUARDAR);
         }
     }
 
-    private void mostrarTodos() {
-        // 1. Pedimos al DAO las entidades
-        List<Estudiante> entidades = dao.obtenerRegistros();
+    public void mostrarTodos() {
 
         try {
+            // 1. Pedimos al DAO las entidades
+            List<Estudiante> entidades = dao.obtenerRegistros();
             // 2. Las mapeamos a DTOs para mandarlas a la vista
             List<EstudianteDTO> dtos = new ArrayList<>();
             for (Estudiante e : entidades) {
                 dtos.add(new EstudianteDTO(e.getId(), e.getDni(), e.getNombre(), e.getApellido()));
             }
-
             // 3. La vista los muestra
             view.mostrarEstudiantes(dtos);
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.ERROR_LECTURA);
+            view.mostrar(Mensajes.ERROR_LECTURA);
         }
     }
 
-    private void actualizarEstudiante() {
+    public void actualizarEstudiante() {
 
         String id = view.pedirId();
 
@@ -94,26 +71,25 @@ public class EstudianteController {
             List<Estudiante> listaActual = dao.obtenerRegistros();
 
             if (!Validaciones.existeEstudiante(listaActual, id)) {
-                Mostrar.Mensaje(Mensajes.ERROR_ID);
+                view.mostrar(Mensajes.ERROR_ID);
                 return;
             }
 
-            Mostrar.Mensaje(Mensajes.PEDIR_NUEVOS_DATOS);
-            // Reutilizamos el metodo de la vista porque ya tiene las validaciones de DNI, nombre, etc.
-            EstudianteDTO datos = view.pedirDatosNuevoEstudiante();
+            view.mostrar(Mensajes.PEDIR_NUEVOS_DATOS);
 
+            EstudianteDTO datos = view.pedirDatosNuevoEstudiante();
             // Creamos la entidad respetando el ID original, pero con los datos nuevos
             Estudiante estudianteModificado = new Estudiante(id, datos.getDni(), datos.getNombre(), datos.getApellido());
 
             dao.modificar(estudianteModificado);
-            Mostrar.Mensaje(Mensajes.EXITO_ACTUALIZAR);
+            view.mostrar(Mensajes.EXITO_ACTUALIZAR);
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.ERROR_GUARDAR);
+            view.mostrar(Mensajes.ERROR_GUARDAR);
         }
 
     }
 
-    private void eliminarEstudiante() {
+    public boolean eliminarEstudiante() {
         String id = view.pedirId();
 
         try {
@@ -121,21 +97,30 @@ public class EstudianteController {
             Estudiante est = dao.obtenerPorId(id);
 
             if (est == null) {
-                Mostrar.Mensaje(Mensajes.ERROR_ID);
-            } else {
-                // 2. Si existe, le decimos al DAO que intente eliminarlo.
-                boolean eliminado = dao.eliminar(id);
-
-                // 3. Solo si el DAO logró eliminarlo de verdad (true), mostramos el éxito
-                if (eliminado) {
-                    Mostrar.Mensaje(Mensajes.EXITO_ELIMINAR);
-                } else {
-                    // Si está en uso, imprimo mensaje Error
-                    Mostrar.Mensaje(Mensajes.ERROR_ELIMINAR_EN_USO);
-                }
+                view.mostrar(Mensajes.ERROR_ID);
+                return false;
             }
+
+            // 2. Regla de negocio: Chequeamos si el estudiante está inscripto en un aula
+            daos.InscripcionDAO inscripcionDAO = new daos.InscripcionDAO();
+            boolean enUso = inscripcionDAO.obtenerRegistros().stream()
+                    .anyMatch(i -> i.getIdEstudiante().equals(id));
+
+            if (enUso) {
+                view.mostrar(Mensajes.ERROR_ELIMINAR_EN_USO);
+                return false;
+            }
+            // 3. Si existe y no está en uso, eliminamos
+            boolean eliminado = dao.eliminar(id);
+
+            if (eliminado) {
+                view.mostrar(Mensajes.EXITO_ELIMINAR);
+                return true;
+            }
+            return false;
         } catch (RuntimeException e) {
-             Mostrar.Mensaje(Mensajes.ERROR_ELIMINAR);
+            view.mostrar(Mensajes.ERROR_ELIMINAR);
+            return false;
         }
     }
 }

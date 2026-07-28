@@ -29,9 +29,5 @@ public class EstudianteDTO {
     public String getApellido() {
         return apellido;
     }
-            
-    @Override
-    public String toString() {
-        return "ID: " + id + " | DNI: " + dni + " | Nombre: " + nombre + " " + apellido;
-    }
+
 }

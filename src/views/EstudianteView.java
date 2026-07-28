@@ -22,12 +22,12 @@ public class EstudianteView {
                            3. Actualizar estudiante
                            4. Eliminar estudiante
                            0. Salir""";
-                           
+
         return Mostrar.Menu(textoMenu, scanner);
     }
 
     public String pedirId() {
-        Mostrar.Mensaje(Mensajes.PEDIR_DATO + "ID del estudiante (ej. E0001): ");
+        mostrar(Mensajes.PEDIR_DATO + "ID del estudiante (ej. E0001): ");
         String idEstudiante = scanner.nextLine();
         return Validaciones.normalizarTexto(idEstudiante);
     }
@@ -35,32 +35,32 @@ public class EstudianteView {
     public EstudianteDTO pedirDatosNuevoEstudiante() {
         String dni;
         do {
-            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "DNI (exactamente 8 numeros): ");
+            mostrar(Mensajes.PEDIR_DATO + "DNI (exactamente 8 numeros): ");
             // El .trim() elimina cualquier espacio accidental al principio o al final
             dni = scanner.nextLine().trim();
 
             if (!Validaciones.esDniValido(dni)) {
-                 Mostrar.Mensaje(Mensajes.ERROR_DATO);
+                mostrar(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esDniValido(dni));
 
         String nombre;
         do {
-            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "Nombre: ");
+            mostrar(Mensajes.PEDIR_DATO + "Nombre: ");
             nombre = scanner.nextLine();
 
             if (!Validaciones.esTextoValido(nombre)) {
-                 Mostrar.Mensaje(Mensajes.ERROR_DATO);
+                mostrar(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esTextoValido(nombre));
 
         String apellido;
         do {
-            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "Apellido: ");
+            mostrar(Mensajes.PEDIR_DATO + "Apellido: ");
             apellido = scanner.nextLine();
 
             if (!Validaciones.esTextoValido(apellido)) {
-                Mostrar.Mensaje(Mensajes.ERROR_DATO);
+                mostrar(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esTextoValido(apellido));
 
@@ -68,15 +68,20 @@ public class EstudianteView {
     }
 
     public void mostrarEstudiantes(List<EstudianteDTO> estudiantes) {
-        System.out.println("\n--- LISTA DE ESTUDIANTES ---");
+        Mostrar.Titulo("LISTA DE ESTUDIANTES");
         if (estudiantes.isEmpty()) {
-            Mostrar.Mensaje(Mensajes.SIN_REGISTROS);
+            mostrar(Mensajes.SIN_REGISTROS);
         } else {
             for (EstudianteDTO dto : estudiantes) {
-                System.out.println(dto.toString());
+                mostrar("ID: " + dto.getId() + " | DNI: " + dto.getDni()
+                        + " | Nombre: " + dto.getNombre() + " " + dto.getApellido());
             }
         }
     }
 
+    // Imprime mensaje
+    public void mostrar(String mensaje) {
+        System.out.println("-> " + mensaje);
+    }
 
 }
