@@ -89,38 +89,38 @@ public class EstudianteController {
 
     }
 
-    public boolean eliminarEstudiante() {
+    public void eliminarEstudiante() {
         String id = view.pedirId();
 
         try {
-            // 1. Primero verificamos si el estudiante existe usando el obtenerPorId
+            // 1. Verifico si el estudiante existe usando el obtenerPorId
             Estudiante est = dao.obtenerPorId(id);
 
             if (est == null) {
                 view.mostrar(Mensajes.ERROR_ID);
-                return false;
+                return; 
             }
 
-            // 2. Regla de negocio: Chequeamos si el estudiante está inscripto en un aula
+            // 2. Regla de negocio: Chequeo si el estudiante está inscripto en un aula
             daos.InscripcionDAO inscripcionDAO = new daos.InscripcionDAO();
             boolean enUso = inscripcionDAO.obtenerRegistros().stream()
                     .anyMatch(i -> i.getIdEstudiante().equals(id));
 
             if (enUso) {
                 view.mostrar(Mensajes.ERROR_ELIMINAR_EN_USO);
-                return false;
+                return; // Corta la ejecución 
             }
+
             // 3. Si existe y no está en uso, eliminamos
             boolean eliminado = dao.eliminar(id);
 
             if (eliminado) {
                 view.mostrar(Mensajes.EXITO_ELIMINAR);
-                return true;
             }
-            return false;
+
         } catch (RuntimeException e) {
             view.mostrar(Mensajes.ERROR_ELIMINAR);
-            return false;
         }
     }
+
 }

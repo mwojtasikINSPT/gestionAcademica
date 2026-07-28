@@ -77,7 +77,7 @@ public class ProfesorController {
         }
     }
 
-    public boolean eliminarProfesor() {
+    public void eliminarProfesor() {
         String id = view.pedirId();
 
         try {
@@ -86,7 +86,7 @@ public class ProfesorController {
 
             if (profe == null) {
                 view.mostrar(Mensajes.ERROR_ID);
-                return false;
+                return; // Corta  ejecución 
             }
 
             // 2. Verificamos si está en uso (Regla de negocio)
@@ -96,7 +96,7 @@ public class ProfesorController {
 
             if (enUso) {
                 view.mostrar(Mensajes.ERROR_ELIMINAR_EN_USO);
-                return false;
+                return; // Corta la ejecución 
             }
 
             // 3. Si existe y no está en uso, ejecutamos la eliminación
@@ -104,15 +104,10 @@ public class ProfesorController {
 
             if (eliminado) {
                 view.mostrar(Mensajes.EXITO_ELIMINAR);
-                return true;
             }
-
-            // Si por algún motivo el DAO falla de forma silenciosa
-            return false;
 
         } catch (RuntimeException e) {
             view.mostrar(Mensajes.ERROR_ELIMINAR);
-            return false;
         }
     }
 }
