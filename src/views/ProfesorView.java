@@ -22,7 +22,7 @@ public class ProfesorView {
     }
 
     public String pedirId() {
-        Mostrar.Mensaje(Mensajes.PEDIR_DATO + " ID del profesor (ej. P0001): ");
+        mostrar(Mensajes.PEDIR_DATO + " ID del profesor (ej. P0001): ");
         String idProfesor = scanner.nextLine();
         return Validaciones.normalizarTexto(idProfesor);
     }
@@ -30,28 +30,28 @@ public class ProfesorView {
     public ProfesorDTO pedirDatosNuevoProfesor() {
         String dni;
         do {
-            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "DNI (exactamente 8 numeros): ");
+            mostrar(Mensajes.PEDIR_DATO + "DNI (exactamente 8 numeros): ");
             dni = scanner.nextLine().trim();
             if (!Validaciones.esDniValido(dni)) {
-                Mostrar.Mensaje(Mensajes.ERROR_DATO);
+                mostrar(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esDniValido(dni));
 
         String nombre;
         do {
-            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "Nombre: ");
+            mostrar(Mensajes.PEDIR_DATO + "Nombre: ");
             nombre = scanner.nextLine().trim();
             if (!Validaciones.esTextoValido(nombre)) {
-                Mostrar.Mensaje(Mensajes.ERROR_DATO);
+                mostrar(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esTextoValido(nombre));
 
         String apellido;
         do {
-            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "Apellido: ");
+            mostrar(Mensajes.PEDIR_DATO + "Apellido: ");
             apellido = scanner.nextLine().trim();
             if (!Validaciones.esTextoValido(apellido)) {
-                Mostrar.Mensaje(Mensajes.ERROR_DATO);
+                mostrar(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esTextoValido(apellido));
 
@@ -59,19 +59,19 @@ public class ProfesorView {
     }
 
     public void mostrarProfesores(List<ProfesorDTO> profesores) {
-        System.out.println("\n--- LISTA DE PROFESORES ---");
+        Mostrar.Titulo("LISTA DE PROFESORES");
         if (profesores.isEmpty()) {
-            Mostrar.Mensaje(Mensajes.SIN_REGISTROS);
+            mostrar(Mensajes.SIN_REGISTROS);
         } else {
             for (ProfesorDTO dto : profesores) {
-                Mostrar.Mensaje(dto.toString());
+                // La Vista decide cómo se ve, no el DTO
+                mostrar("ID: " + dto.getId() + " | DNI: " + dto.getDni() + " | Nombre: " + dto.getNombre() + " " + dto.getApellido());
             }
         }
     }
 
-    // Imprime mensaje
+    // Este es el único punto de salida a la consola (además de los menús fijos)
     public void mostrar(String mensaje) {
         System.out.println("-> " + mensaje);
     }
-
 }
