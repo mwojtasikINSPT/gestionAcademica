@@ -19,34 +19,9 @@ public class ProfesorController {
         this.dao = dao;
         this.view = view;
     }
+    
 
-    public void iniciar() {
-        int opcion;
-        do {
-            opcion = view.mostrarMenu();
-            switch (opcion) {
-                case 1:
-                    registrarProfesor();
-                    break;
-                case 2:
-                    mostrarTodos();
-                    break;
-                case 3:
-                    actualizarProfesor();
-                    break;
-                case 4:
-                    eliminarProfesor();
-                    break;
-                case 0:
-                    Mostrar.Mensaje(Mensajes.VOLVIENDO);
-                    break;
-                default:
-                    Mostrar.Mensaje(Mensajes.OPCION_INVALIDA);
-            }
-        } while (opcion != 0); // Corta automaticamente cuando es 0
-    }
-
-    private void registrarProfesor() {
+    public void registrarProfesor() {
         ProfesorDTO datos = view.pedirDatosNuevoProfesor();
 
         try {
@@ -61,14 +36,14 @@ public class ProfesorController {
             Profesor nuevoProfesor = new Profesor(nuevoId, datos.getDni(), datos.getNombre(), datos.getApellido());
 
             dao.agregar(nuevoProfesor);
-            Mostrar.Mensaje(Mensajes.EXITO_GUARDAR);
+            view.mostrar(Mensajes.EXITO_GUARDAR);
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.ERROR_GUARDAR);
+            view.mostrar(Mensajes.ERROR_GUARDAR);
         }
     }
 
-    private void mostrarTodos() {
-        
+    public void mostrarTodos() {
+
         try {
             List<Profesor> entidades = dao.obtenerRegistros();
             List<ProfesorDTO> dtos = new ArrayList<>();
@@ -77,11 +52,11 @@ public class ProfesorController {
             }
             view.mostrarProfesores(dtos);
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.ERROR_LECTURA);
+            view.mostrar(Mensajes.ERROR_LECTURA);
         }
     }
 
-    private void actualizarProfesor() {
+    public void actualizarProfesor() {
         String id = view.pedirId();
 
         try {
@@ -97,34 +72,44 @@ public class ProfesorController {
             Profesor profeModificado = new Profesor(id, datos.getDni(), datos.getNombre(), datos.getApellido());
 
             dao.modificar(profeModificado);
-            Mostrar.Mensaje(Mensajes.EXITO_ACTUALIZAR);
+            view.mostrar(Mensajes.EXITO_ACTUALIZAR);
         } catch (RuntimeException e) {
-            Mostrar.Mensaje(Mensajes.ERROR_GUARDAR);
+            view.mostrar(Mensajes.ERROR_GUARDAR);
         }
     }
 
-    private void eliminarProfesor() {
+    public void eliminarProfesor() {
         String id = view.pedirId();
-        
-        try{
-        // 1. Primero verificamos si el profesor existe usando el obtenerPorId
-        Profesor profe = dao.obtenerPorId(id);
 
-        if (profe == null) {
-            // Si es null, mostramos el error de que no se encontró
-            Mostrar.Mensaje(Mensajes.ERROR_ID);
-        } else {
-            // 2. Si existe, le decimos al DAO que intente eliminarlo.
-            // Si está asignado, el DAO va a frenarlo, imprimir su propio mensaje y devolver false.
+        try {
+            // 1. Verificamos si el profesor existe
+            Profesor profe = dao.obtenerPorId(id);
+
+            if (profe == null) {
+                view.mostrar(Mensajes.ERROR_ID);
+                return; // Cortamos acá
+            }
+
+            // 2. Verificamos si está en uso (Regla de negocio)
+            daos.AsignacionDAO asignacionDAO = new daos.AsignacionDAO();
+
+            boolean enUso = asignacionDAO.obtenerRegistros().stream()
+                    .anyMatch(a -> a.getIdProfesor().equals(id));
+
+            if (enUso) {
+                view.mostrar(Mensajes.ERROR_ELIMINAR_EN_USO);
+                return; // Cortamos acá
+            }
+
+            // 3. Si existe y no está en uso, ejecutamos la eliminación
             boolean eliminado = dao.eliminar(id);
 
-            // 3. Solo si el DAO logró eliminarlo de verdad (true), mostramos el éxito
             if (eliminado) {
-                Mostrar.Mensaje(Mensajes.EXITO_ELIMINAR);
+                view.mostrar(Mensajes.EXITO_ELIMINAR);
             }
-        }}
-        catch(RuntimeException e){
-            Mostrar.Mensaje(Mensajes.ERROR_ELIMINAR);
+
+        } catch (RuntimeException e) {
+            view.mostrar(Mensajes.ERROR_ELIMINAR);
         }
     }
 }

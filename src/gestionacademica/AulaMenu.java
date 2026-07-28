@@ -5,11 +5,11 @@ import dtos.AulaDTO;
 import utils.Mensajes;
 import views.AulaView;
 
-public class MenuAula {
+public class AulaMenu {
     private final AulaView view;
     private final AulaController controller;
 
-    public MenuAula(AulaController controller, AulaView view) {
+    public AulaMenu(AulaController controller, AulaView view) {
         this.controller = controller;
         this.view = view;
     }

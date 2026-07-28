@@ -1,14 +1,13 @@
 package models;
 
 public class Profesor {
+
     private String id;
     private String dni;
     private String nombre;
     private String apellido;
-    
-    // Relación 1 a 1: Un profesor tiene un aula asignada
-    private Aula aula; 
 
+    // Relación 1 a 1: Un profesor tiene un aula asignada
     public Profesor(String id, String dni, String nombre, String apellido) {
         this.id = id;
         this.dni = dni;
@@ -17,13 +16,8 @@ public class Profesor {
     }
 
     // --- Getters y Setters ---
-
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getDni() {
@@ -50,11 +44,4 @@ public class Profesor {
         this.apellido = apellido;
     }
 
-    public Aula getAula() {
-        return aula;
-    }
-
-    public void setAula(Aula aula) {
-        this.aula = aula;
-    }
 }

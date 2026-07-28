@@ -35,7 +35,6 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
     public void guardarTodos(List<Profesor> profesores) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARCHIVO))) {
             for (Profesor prof : profesores) {
-                // Uso metodo toLineaArchivo() de la entidad Profesor
                 bw.write(prof.getId() + ";" + prof.getDni() + ";" + prof.getNombre() + ";" + prof.getApellido());
                 bw.newLine();
             }
@@ -52,13 +51,13 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
     }
 
     @Override
-    public void modificar(Profesor profeModificado) {
+    public void modificar(Profesor profModificado) {
         List<Profesor> lista = obtenerRegistros();
         for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getId().equals(profeModificado.getId())) {
-                lista.set(i, profeModificado);
+            if (lista.get(i).getId().equals(profModificado.getId())) {
+                lista.set(i, profModificado);
                 guardarTodos(lista);
-                return; 
+                return;
             }
         }
     }
@@ -66,10 +65,10 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
     @Override
     public Profesor obtenerPorId(String id) {
         // Recorremos la lista de profesores
-        for (Profesor profe : obtenerRegistros()) {
+        for (Profesor profesor : obtenerRegistros()) {
             // Si el ID coincide, devolvemos el objeto completo
-            if (profe.getId().equals(id)) {
-                return profe;
+            if (profesor.getId().equals(id)) {
+                return profesor;
             }
         }
         // Si no lo encuentra, devuelve null
@@ -78,33 +77,14 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
 
     @Override
     public boolean eliminar(String id) {
-        // 1. Instanciamos el DAO que necesitamos consultar
-        AsignacionDAO asignacionDAO = new AsignacionDAO();
+        List<Profesor> lista = obtenerRegistros();
 
-        // 2. Chequeamos si el profesor está asignado a un aula
-        boolean enUso = asignacionDAO.obtenerRegistros().stream()
-                .anyMatch(a -> a.getIdProfesor().equals(id));
+        // removeIf devuelve true si encontró el ID y lo borró, false si no existía
+        boolean eliminado = lista.removeIf(p -> p.getId().equals(id));
 
-        if (enUso) {
-            return false;
+        if (eliminado) {
+            guardarTodos(lista); // Solo guardamos si realmente se borró algo
         }
-
-        // 3. Verificamos si el profesor realmente existe 
-        Profesor profeAEliminar = obtenerPorId(id);
-
-        // 4. Si existe (no es null), procedemos a borrarlo
-        if (profeAEliminar != null) {
-            List<Profesor> lista = obtenerRegistros();
-
-            // Removemos de la lista de forma limpia usando removeIf
-            lista.removeIf(p -> p.getId().equals(id));
-
-            guardarTodos(lista); // Guardamos los cambios en el archivo
-            return true;         // Avisamos que la baja fue un éxito
-        }
-
-        // 5. Si no existía en la lista, devolvemos false
-        return false;
+        return eliminado;
     }
-
 }
