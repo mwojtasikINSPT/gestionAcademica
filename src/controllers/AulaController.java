@@ -8,6 +8,7 @@ import models.Aula;
 import java.util.ArrayList;
 import java.util.List;
 import utils.*;
+import views.AulaView;
 
 //Controller: coordina la operación y decide qué mensaje corresponde.
 public class AulaController {
@@ -15,14 +16,19 @@ public class AulaController {
     private final AsignacionDAO asignacionDAO = new AsignacionDAO();
     private final InscripcionDAO inscripcionDAO = new InscripcionDAO();
     private final AulaDAO dao;
+    private final AulaView view;
 
-    public AulaController(AulaDAO dao) {
+    public AulaController(AulaDAO dao, AulaView view) {
         this.dao = dao;
+        this.view = view;
     }
 
-    public AulaDTO registrarAula(int capacidad) {
+    public void registrarAula() {
         try {
+            // El controlador le pide el dato a la vista 
+            int capacidad = view.pedirCapacidad();
             List<Aula> listaActual = dao.obtenerRegistros();
+
             List<String> codigosActuales = new ArrayList<>();
 
             for (Aula a : listaActual) {
@@ -33,13 +39,14 @@ public class AulaController {
             Aula nuevaAula = new Aula(nuevoCodigo, capacidad);
 
             dao.agregar(nuevaAula);
-            return new AulaDTO(nuevaAula.getCodigo(), nuevaAula.getCapacidad());
+            // Mostramos ok a través de la vista
+            view.mostrar(Mensajes.EXITO_GUARDAR + " (Código: " + nuevaAula.getCodigo() + ")");
         } catch (RuntimeException e) {
-            return null;
+            view.mostrar(Mensajes.ERROR_GUARDAR);
         }
     }
 
-    public List<AulaDTO> mostrarTodas() {
+    public void mostrarTodas() {
         try {
             // 1. Intento obtener los registros
             List<Aula> entidades = dao.obtenerRegistros();
@@ -49,39 +56,46 @@ public class AulaController {
             for (Aula a : entidades) {
                 dtos.add(new AulaDTO(a.getCodigo(), a.getCapacidad()));
             }
-
-            // 3.Devuelvo
-            return dtos;
+            // 3.Devuelvo (paso directamente a la vista)
+            view.mostrarAulas(dtos);
         } catch (RuntimeException e) {
             // 4. Si el DAO fallo
-            return null;
+            view.mostrar(Mensajes.ERROR_LECTURA);
         }
     }
 
-    public boolean actualizarAula(String codigo, int capacidad) {
+    public void actualizarAula() {
+
         try {
+            //Pido codigo
+            String codigo = view.pedirCodigo();
             Aula aulaExistente = dao.obtenerPorId(codigo);
 
             if (aulaExistente == null) {
-                return false;
+                view.mostrar(Mensajes.ERROR_ID);
+                return;
             }
+
+            // Si existe, pido capacidad a la vista
+            int capacidad = view.pedirCapacidad();
+
             dao.modificar(new Aula(codigo, capacidad));
-            return true;
+            view.mostrar(Mensajes.EXITO_ACTUALIZAR);
         } catch (RuntimeException e) {
-            return false;
+            view.mostrar(Mensajes.ERROR_GUARDAR);
         }
     }
 
-    public boolean eliminarAula(String codigo) {
+    public void eliminarAula() {
         try {
-            // 1. Verificamos si el aula existe
+            String codigo = view.pedirCodigo();
             Aula aula = dao.obtenerPorId(codigo);
 
             if (aula == null) {
-                return false;
-            } 
-            
-            // 2. Lógica de negocio 
+                view.mostrar(Mensajes.ERROR_ID);
+                return; // Cortamos la ejecución acá
+            }
+            //Reviso si el aula tiene prof asignado o alumnos    
             boolean enUsoPorProfesor = asignacionDAO.obtenerRegistros().stream()
                     .anyMatch(a -> a.getCodigoAula().equals(codigo));
 
@@ -89,14 +103,17 @@ public class AulaController {
                     .anyMatch(i -> i.getCodigoAula().equals(codigo));
 
             if (enUsoPorProfesor || enUsoPorAlumnos) {
-                return false;
+                view.mostrar(Mensajes.ERROR_ELIMINAR_EN_USO);
+                return; // Cortamos la ejecución acá
             }
 
-            // 3. Si existe y no está en uso, le damos la orden al DAO de eliminarla
-            return dao.eliminar(codigo);
-            
+            boolean eliminado = dao.eliminar(codigo);
+            if (eliminado) {
+                view.mostrar(Mensajes.EXITO_ELIMINAR);
+            }
+
         } catch (RuntimeException e) {
-            return false;
+            view.mostrar(Mensajes.ERROR_ELIMINAR);
         }
     }
 }

@@ -31,7 +31,7 @@ public class AppConfig {
         //Capa Lógica (El controlador necesita al DAO para guardar y a la Vista)
         EstudianteController controllerEst = new EstudianteController(daoEst, viewEst);
         ProfesorController controllerProf = new ProfesorController(daoProf, viewProf);
-        AulaController controllerAula = new AulaController(daoAula);
+        AulaController controllerAula = new AulaController(daoAula, viewAula);
         InscripcionController controllerInsc = new InscripcionController(daoInsc, viewInsc, daoEst, daoAula);
         AsignacionController controllerAsign = new AsignacionController(daoAsign, viewAsign, daoProf, daoAula);
         ConsultasController controllerCons = new ConsultasController(consView, daoEst, daoProf, daoInsc, daoAsign);
