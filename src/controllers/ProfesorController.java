@@ -19,7 +19,6 @@ public class ProfesorController {
         this.dao = dao;
         this.view = view;
     }
-    
 
     public void registrarProfesor() {
         ProfesorDTO datos = view.pedirDatosNuevoProfesor();
@@ -67,7 +66,7 @@ public class ProfesorController {
                 return;
             }
 
-            Mostrar.Mensaje("Ingrese los NUEVOS datos para el profesor:");
+            view.mostrar(Mensajes.PEDIR_NUEVOS_DATOS);
             ProfesorDTO datos = view.pedirDatosNuevoProfesor();
             Profesor profeModificado = new Profesor(id, datos.getDni(), datos.getNombre(), datos.getApellido());
 
@@ -78,7 +77,7 @@ public class ProfesorController {
         }
     }
 
-    public void eliminarProfesor() {
+    public boolean eliminarProfesor() {
         String id = view.pedirId();
 
         try {
@@ -87,18 +86,17 @@ public class ProfesorController {
 
             if (profe == null) {
                 view.mostrar(Mensajes.ERROR_ID);
-                return; // Cortamos acá
+                return false;
             }
 
             // 2. Verificamos si está en uso (Regla de negocio)
             daos.AsignacionDAO asignacionDAO = new daos.AsignacionDAO();
-
             boolean enUso = asignacionDAO.obtenerRegistros().stream()
                     .anyMatch(a -> a.getIdProfesor().equals(id));
 
             if (enUso) {
                 view.mostrar(Mensajes.ERROR_ELIMINAR_EN_USO);
-                return; // Cortamos acá
+                return false;
             }
 
             // 3. Si existe y no está en uso, ejecutamos la eliminación
@@ -106,10 +104,16 @@ public class ProfesorController {
 
             if (eliminado) {
                 view.mostrar(Mensajes.EXITO_ELIMINAR);
+                return true;
             }
+
+            // Si por algún motivo el DAO falla de forma silenciosa
+            return false;
 
         } catch (RuntimeException e) {
             view.mostrar(Mensajes.ERROR_ELIMINAR);
+            return false;
         }
     }
+}
 }
