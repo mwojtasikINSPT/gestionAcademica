@@ -2,9 +2,9 @@ package dtos;
 
 public class AsignacionDTO {
 
-    public String idAsignacion;
-    public String idProfesor;
-    public String codigoAula;
+    private final String idAsignacion;
+    private final String idProfesor;
+    private final String codigoAula;
 
     public AsignacionDTO(String idAsignacion, String idProfesor, String codigoAula) {
         this.idAsignacion = idAsignacion;

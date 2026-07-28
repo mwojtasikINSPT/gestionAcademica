@@ -4,6 +4,7 @@ import dtos.InscripcionDTO;
 import utils.Validaciones;
 import java.util.List;
 import java.util.Scanner;
+import utils.Mostrar;
 
 public class InscripcionView {
 
@@ -16,7 +17,7 @@ public class InscripcionView {
                 + "3. Modificar inscripcion\n"
                 + "4. Eliminar inscripcion\n"
                 + "0. Volver al menu principal";
-        return Validaciones.mostrarMenu(textoMenu, scanner);
+        return Mostrar.Menu(textoMenu, scanner);
     }
 
     public String pedirIdInscripcion() {

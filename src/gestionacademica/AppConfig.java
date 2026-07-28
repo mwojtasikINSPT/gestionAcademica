@@ -30,10 +30,11 @@ public class AppConfig {
         // 2. Ensamblamos los Controladores / Inyeccion de dependencias
         EstudianteController controllerEst = new EstudianteController(daoEst, viewEst);
         ProfesorController controllerProf = new ProfesorController(daoProf, viewProf);
-        AulaController controllerAula = new AulaController(daoAula, viewAula);
+        AulaController controllerAula = new AulaController(daoAula);
         InscripcionController controllerInsc = new InscripcionController(daoInsc, viewInsc, daoEst, daoAula);
         AsignacionController controllerAsign = new AsignacionController(daoAsign, viewAsign, daoProf, daoAula);
         ConsultasController controllerCons = new ConsultasController(consView, daoEst, daoProf, daoInsc, daoAsign);
+        MenuAula aulaMenu = new MenuAula(controllerAula, viewAula);
 
         // 3. Bucle del Menu Principal
         int opcion;
@@ -48,7 +49,7 @@ public class AppConfig {
                     controllerProf.iniciar();
                     break;
                 case 3:
-                    controllerAula.iniciar();
+                    aulaMenu.iniciar();
                     break;
                 case 4:
                     controllerInsc.iniciar();

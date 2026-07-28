@@ -1,6 +1,5 @@
 package daos;
 
-// Aisla la logica del archivo. Si el archivo no existe, lo crea
 import models.Estudiante;
 import java.io.*;
 import java.util.ArrayList;
@@ -9,8 +8,8 @@ import java.util.List;
 public class EstudianteDAO implements ICrud<Estudiante, String> {
 
     private final String ARCHIVO = "estudiantes.txt";
-
-    // Carga los estudiantes del archivo a la memoria
+    
+    // Aisla la logica del archivo. Si el archivo no existe, lo crea
     @Override
     public List<Estudiante> obtenerRegistros() {
         List<Estudiante> estudiantes = new ArrayList<>();
@@ -30,7 +29,7 @@ public class EstudianteDAO implements ICrud<Estudiante, String> {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error al leer el archivo: " + e.getMessage());
+            throw new RuntimeException("Error al leer el archivo", e );
         }
         return estudiantes;
     }
@@ -43,7 +42,7 @@ public class EstudianteDAO implements ICrud<Estudiante, String> {
                 bw.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar: " + e.getMessage());
+            throw new RuntimeException("Error al guardar", e );
         }
     }
 
@@ -91,7 +90,6 @@ public class EstudianteDAO implements ICrud<Estudiante, String> {
                 .anyMatch(i -> i.getIdEstudiante().equals(id));
 
         if (enUso) {
-            System.out.println("ERROR: No se puede eliminar el estudiante porque esta inscripto en un aula.");
             return false;
         }
         //1. Busco x id
@@ -107,7 +105,6 @@ public class EstudianteDAO implements ICrud<Estudiante, String> {
             guardarTodos(lista); // Guardamos los cambios
             return true;         // Avisamos que fue un éxito
         }
-
         // 3. Si era null (no existía), directamente devolvemos false
         return false;
     }

@@ -27,7 +27,7 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error al leer el archivo de profesores: " + e.getMessage());
+            throw new RuntimeException("Error al leer el archivo", e);
         }
         return profesores;
     }
@@ -40,7 +40,7 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
                 bw.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar profesores: " + e.getMessage());
+            throw new RuntimeException("Error al guardar", e);
         }
     }
 
@@ -58,7 +58,7 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
             if (lista.get(i).getId().equals(profeModificado.getId())) {
                 lista.set(i, profeModificado);
                 guardarTodos(lista);
-                return; // Corta la ejecución del método una vez que guarda
+                return; 
             }
         }
     }
@@ -86,7 +86,6 @@ public class ProfesorDAO implements ICrud<Profesor, String> {
                 .anyMatch(a -> a.getIdProfesor().equals(id));
 
         if (enUso) {
-            System.out.println("ERROR: No se puede eliminar el profesor porque tiene un aula asignada.");
             return false;
         }
 

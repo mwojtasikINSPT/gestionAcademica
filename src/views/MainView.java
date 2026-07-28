@@ -1,6 +1,6 @@
 package views;
 
-import utils.Validaciones;
+import utils.Mostrar;
 import java.util.Scanner;
 
 public class MainView {
@@ -17,7 +17,7 @@ public class MainView {
                 + "6. Consultas\n"
                 + "0. Salir del sistema";
 
-        return Validaciones.mostrarMenu(menu, scanner);
+        return Mostrar.Menu(menu, scanner);
     }
 
     public void mostrarMensaje(String mensaje) {

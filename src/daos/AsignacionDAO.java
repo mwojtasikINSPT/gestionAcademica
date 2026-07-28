@@ -26,7 +26,7 @@ public class AsignacionDAO implements ICrud<Asignacion, String> {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error al leer asignaciones: " + e.getMessage());
+            throw new RuntimeException("Error al leer asignaciones " , e);
         }
         return asignaciones;
     }
@@ -38,7 +38,7 @@ public class AsignacionDAO implements ICrud<Asignacion, String> {
                 bw.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar asignaciones: " + e.getMessage());
+           throw new RuntimeException("Error al guardar asignaciones" , e);
         }
     }
 

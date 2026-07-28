@@ -1,118 +1,102 @@
 package controllers;
 
+import daos.AsignacionDAO;
 import daos.AulaDAO;
+import daos.InscripcionDAO;
 import dtos.AulaDTO;
 import models.Aula;
-import utils.Validaciones;
-import views.AulaView;
 import java.util.ArrayList;
 import java.util.List;
-import utils.Mensajes;
+import utils.*;
 
+//Controller: coordina la operación y decide qué mensaje corresponde.
 public class AulaController {
 
-    private AulaDAO dao;
-    private AulaView view;
+    private final AsignacionDAO asignacionDAO = new AsignacionDAO();
+    private final InscripcionDAO inscripcionDAO = new InscripcionDAO();
+    private final AulaDAO dao;
 
-    public AulaController(AulaDAO dao, AulaView view) {
+    public AulaController(AulaDAO dao) {
         this.dao = dao;
-        this.view = view;
     }
 
-    public void iniciar() {
-        int opcion;
-        do {
-            opcion = view.mostrarMenu();
-            switch (opcion) {
-                case 1:
-                    registrarAula();
-                    break;
-                case 2:
-                    mostrarTodas();
-                    break;
-                case 3:
-                    actualizarAula();
-                    break;
-                case 4:
-                    eliminarAula();
-                    break;
-                case 0:
-                    view.mostrarMensaje(Mensajes.VOLVIENDO);
-                    break;
-                default:
-                    view.mostrarMensaje(Mensajes.OPCION_INVALIDA);
+    public AulaDTO registrarAula(int capacidad) {
+        try {
+            List<Aula> listaActual = dao.obtenerRegistros();
+            List<String> codigosActuales = new ArrayList<>();
+
+            for (Aula a : listaActual) {
+                codigosActuales.add(a.getCodigo());
             }
-        } while (opcion != 0);
-    }
 
-    private void registrarAula() {
-        AulaDTO datos = view.pedirDatosNuevaAula();
-        List<Aula> listaActual = dao.obtenerRegistros();
-        List<String> codigosActuales = new ArrayList<>();
+            String nuevoCodigo = Validaciones.generarSiguienteId(codigosActuales, "A");
+            Aula nuevaAula = new Aula(nuevoCodigo, capacidad);
 
-        for (Aula a : listaActual) {
-            codigosActuales.add(a.getCodigo());
+            dao.agregar(nuevaAula);
+            return new AulaDTO(nuevaAula.getCodigo(), nuevaAula.getCapacidad());
+        } catch (RuntimeException e) {
+            return null;
         }
-
-        String nuevoCodigo = Validaciones.generarSiguienteId(codigosActuales, "A");
-        Aula nuevaAula = new Aula(nuevoCodigo, datos.capacidad);
-
-        dao.agregar(nuevaAula);
-        view.mostrarMensaje(Mensajes.EXITO_GUARDAR);
     }
 
-    private void mostrarTodas() {
-        List<Aula> entidades = dao.obtenerRegistros();
-        List<AulaDTO> dtos = new ArrayList<>();
-        for (Aula a : entidades) {
-            dtos.add(new AulaDTO(a.getCodigo(), a.getCapacidad()));
-        }
-        view.mostrarAulas(dtos);
-    }
+    public List<AulaDTO> mostrarTodas() {
+        try {
+            // 1. Intento obtener los registros
+            List<Aula> entidades = dao.obtenerRegistros();
 
-    private void actualizarAula() {
-        String codigo = view.pedirCodigo();
-        List<Aula> listaActual = dao.obtenerRegistros();
-
-        if (!Validaciones.existeAula(listaActual, codigo)) {
-            view.mostrarMensaje(Mensajes.ERROR_ID);
-            return;
-        }
-
-        view.mostrarMensaje("Ingrese los NUEVOS datos para el aula:");
-        AulaDTO datos = view.pedirDatosNuevaAula();
-        Aula aulaModificada = new Aula(codigo, datos.capacidad);
-
-        dao.modificar(aulaModificada);
-        view.mostrarMensaje(Mensajes.EXITO_ACTUALIZAR);
-
-    }
-
-    private void eliminarAula() {
-        String codigo = view.pedirCodigo();
-        /*
-        if (dao.eliminar(codigo)) {
-            view.mostrarMensaje(Mensajes.EXITO_ELIMINAR);
-        } else {
-            view.mostrarMensaje(Mensajes.ERROR_ID);
-    }
-         */
-        // 1. Verificamos si el aula existe 
-        Aula aula = dao.obtenerPorId(codigo);
-
-        if (aula == null) {
-            // Si es null, cortamos acá y damos el error real de que no existe
-            System.out.println("-> Error: No se encontro el ID ingresado.");
-        } else {
-            // 2. Si existe, intentamos eliminarla. 
-            // Si está en uso, el DAO va a imprimir su propio mensaje de error y devolver false.
-            boolean eliminada = dao.eliminar(codigo);
-
-            // 3. Si devolvió true, avisamos que salió todo bien.
-            if (eliminada) {
-                System.out.println("Aula eliminada con éxito.");
+            // 2. Si accede a registros,
+            List<AulaDTO> dtos = new ArrayList<>();
+            for (Aula a : entidades) {
+                dtos.add(new AulaDTO(a.getCodigo(), a.getCapacidad()));
             }
-        }
 
+            // 3.Devuelvo
+            return dtos;
+        } catch (RuntimeException e) {
+            // 4. Si el DAO fallo
+            return null;
+        }
+    }
+
+    public boolean actualizarAula(String codigo, int capacidad) {
+        try {
+            Aula aulaExistente = dao.obtenerPorId(codigo);
+
+            if (aulaExistente == null) {
+                return false;
+            }
+            dao.modificar(new Aula(codigo, capacidad));
+            return true;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    public boolean eliminarAula(String codigo) {
+        try {
+            // 1. Verificamos si el aula existe
+            Aula aula = dao.obtenerPorId(codigo);
+
+            if (aula == null) {
+                return false;
+            } 
+            
+            // 2. Lógica de negocio 
+            boolean enUsoPorProfesor = asignacionDAO.obtenerRegistros().stream()
+                    .anyMatch(a -> a.getCodigoAula().equals(codigo));
+
+            boolean enUsoPorAlumnos = inscripcionDAO.obtenerRegistros().stream()
+                    .anyMatch(i -> i.getCodigoAula().equals(codigo));
+
+            if (enUsoPorProfesor || enUsoPorAlumnos) {
+                return false;
+            }
+
+            // 3. Si existe y no está en uso, le damos la orden al DAO de eliminarla
+            return dao.eliminar(codigo);
+            
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 }

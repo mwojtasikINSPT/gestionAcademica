@@ -26,7 +26,7 @@ public class InscripcionDAO implements ICrud<Inscripcion, String> {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error al leer el archivo de inscripciones: " + e.getMessage());
+            throw new RuntimeException("Error al leer el archivo de inscripciones ", e);
         }
         return inscripciones;
     }
@@ -38,7 +38,7 @@ public class InscripcionDAO implements ICrud<Inscripcion, String> {
                 bw.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar inscripciones: " + e.getMessage());
+            throw new RuntimeException("Error al guardar inscripciones", e);
         }
     }
 
@@ -59,9 +59,7 @@ public class InscripcionDAO implements ICrud<Inscripcion, String> {
             if (listaInscripciones.get(i).getIdInscripcion().equals(inscripcionActual.getIdInscripcion())) {
                 // Cuando la encontramos, la reemplazamos por el objeto actualizado
                 listaInscripciones.set(i, inscripcionActual);
-
                 guardarTodas(listaInscripciones);
-
                 return; // Cortamos la ejecución porque ya terminamos el reemplazo
             }
         }
@@ -95,7 +93,6 @@ public class InscripcionDAO implements ICrud<Inscripcion, String> {
             guardarTodas(lista); // Guardamos los cambios en el archivo
             return true;         // Avisamos que fue un éxito
         }
-
         // 3. Si no existía, devolvemos false
         return false;
     }

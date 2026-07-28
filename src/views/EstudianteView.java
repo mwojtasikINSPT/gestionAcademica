@@ -3,27 +3,31 @@ package views;
 import dtos.EstudianteDTO;
 import java.util.List;
 import java.util.Scanner;
+import utils.Mensajes;
+import utils.Mostrar;
 import utils.Validaciones;
 
 // se encarga de imprimir y pedir datos. 
 //No conoce a la clase Estudiante, solo maneja EstudianteDTO.
 public class EstudianteView {
 
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
 
     public int mostrarMenu() {
-        String textoMenu = "\n--- GESTION DE ESTUDIANTES ---\n" +
-                           "1. Registrar nuevo estudiante\n" +
-                           "2. Ver todos los estudiantes\n" +
-                           "3. Actualizar estudiante\n" +
-                           "4. Eliminar estudiante\n" +
-                           "0. Salir";
+        String textoMenu = """
                            
-        return Validaciones.mostrarMenu(textoMenu, scanner);
+                           --- GESTION DE ESTUDIANTES ---
+                           1. Registrar nuevo estudiante
+                           2. Ver todos los estudiantes
+                           3. Actualizar estudiante
+                           4. Eliminar estudiante
+                           0. Salir""";
+                           
+        return Mostrar.Menu(textoMenu, scanner);
     }
 
     public String pedirId() {
-        System.out.print("Ingrese el ID del estudiante (ej. E0001): ");
+        Mostrar.Mensaje(Mensajes.PEDIR_DATO + "ID del estudiante (ej. E0001): ");
         String idEstudiante = scanner.nextLine();
         return Validaciones.normalizarTexto(idEstudiante);
     }
@@ -31,32 +35,32 @@ public class EstudianteView {
     public EstudianteDTO pedirDatosNuevoEstudiante() {
         String dni;
         do {
-            System.out.print("DNI (exactamente 8 numeros): ");
+            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "DNI (exactamente 8 numeros): ");
             // El .trim() elimina cualquier espacio accidental al principio o al final
             dni = scanner.nextLine().trim();
 
             if (!Validaciones.esDniValido(dni)) {
-                mostrarMensaje("Error: El DNI ingresado no es valido.");
+                 Mostrar.Mensaje(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esDniValido(dni));
 
         String nombre;
         do {
-            System.out.print("Nombre: ");
+            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "Nombre: ");
             nombre = scanner.nextLine();
 
             if (!Validaciones.esTextoValido(nombre)) {
-                mostrarMensaje("Error: El nombre no puede estar vacio.");
+                 Mostrar.Mensaje(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esTextoValido(nombre));
 
         String apellido;
         do {
-            System.out.print("Apellido: ");
+            Mostrar.Mensaje(Mensajes.PEDIR_DATO + "Apellido: ");
             apellido = scanner.nextLine();
 
             if (!Validaciones.esTextoValido(apellido)) {
-                mostrarMensaje("Error: El apellido no puede estar vacio.");
+                Mostrar.Mensaje(Mensajes.ERROR_DATO);
             }
         } while (!Validaciones.esTextoValido(apellido));
 
@@ -66,7 +70,7 @@ public class EstudianteView {
     public void mostrarEstudiantes(List<EstudianteDTO> estudiantes) {
         System.out.println("\n--- LISTA DE ESTUDIANTES ---");
         if (estudiantes.isEmpty()) {
-            System.out.println("No hay estudiantes registrados.");
+            Mostrar.Mensaje(Mensajes.SIN_REGISTROS);
         } else {
             for (EstudianteDTO dto : estudiantes) {
                 System.out.println(dto.toString());
@@ -74,7 +78,5 @@ public class EstudianteView {
         }
     }
 
-    public void mostrarMensaje(String mensaje) {
-        System.out.println("-> " + mensaje);
-    }
+
 }

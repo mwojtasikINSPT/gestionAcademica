@@ -5,10 +5,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+//DAO: solo accede y modifica datos. No debe imprimir mensajes de usuario
 public class AulaDAO implements ICrud<Aula, String> {
-
-    AsignacionDAO asignacionDAO = new AsignacionDAO();
-    InscripcionDAO inscripcionDAO = new InscripcionDAO();
 
     private final String ARCHIVO = "aulas.txt";
 
@@ -19,7 +17,7 @@ public class AulaDAO implements ICrud<Aula, String> {
         if (!file.exists()) {
             return aulas;
         }
-
+        //Try-catch, interactua con archivos
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String linea;
             while ((linea = br.readLine()) != null) {
@@ -30,19 +28,20 @@ public class AulaDAO implements ICrud<Aula, String> {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error al leer el archivo de aulas: " + e.getMessage());
+            throw new RuntimeException("Error al leer el archivo de aulas. ", e);
         }
         return aulas;
     }
 
     public void guardarTodas(List<Aula> aulas) {
+        //Try-catch, interactua con archivos
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARCHIVO))) {
             for (Aula aula : aulas) {
                 bw.write(aula.getCodigo() + ";" + aula.getCapacidad());
                 bw.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar aulas: " + e.getMessage());
+            throw new RuntimeException("Error al sobreescribir archivo ", e);
         }
     }
 
@@ -73,59 +72,16 @@ public class AulaDAO implements ICrud<Aula, String> {
                 .orElse(null);
     }
 
-   
-    /* 
-    public boolean eliminar(String codigo) {
-        // 1. Verificamos si el aula existe usando tu método con Streams
-        Aula aulaAEliminar = obtenerPorId(codigo);
-
-        // 2. Si la encuentra (no es null), procedemos a borrarla
-        if (aulaAEliminar != null) {
-            List<Aula> lista = obtenerRegistros();
-
-            // Removemos de la lista usando removeIf
-            lista.removeIf(a -> a.getCodigo().equals(codigo));
-
-            guardarTodas(lista); // Guardamos los cambios en el archivo
-            return true;         // Avisamos que fue un éxito
-        }
-
-        // 3. Si no existía, devolvemos false
-        return false;
-    }
-    */
-
     @Override
     public boolean eliminar(String codigo) {
-
-    // 1. Chequeamos si el aula está en alguna Asignación (si tiene profesor)
-    boolean enUsoPorProfesor = asignacionDAO.obtenerRegistros().stream()
-            .anyMatch(a -> a.getCodigoAula().equals(codigo));
-
-    // 2. Chequeamos si el aula está en alguna Inscripción (si tiene alumnos)
-    boolean enUsoPorAlumnos = inscripcionDAO.obtenerRegistros().stream()
-            .anyMatch(i -> i.getCodigoAula().equals(codigo));
-
-    // 3. Si está en uso, informamos y abortamos devolviendo false
-    if (enUsoPorProfesor || enUsoPorAlumnos) {
-        System.out.println("ERROR: No se puede eliminar el aula porque tiene un profesor o alumnos asignados.");
-        return false; 
-    }
-
-    // 4. Si el aula está "limpia", procedemos con la lógica de eliminación normal
-    Aula aulaAEliminar = obtenerPorId(codigo);
-
-    if (aulaAEliminar != null) {
         List<Aula> lista = obtenerRegistros();
-        
-        lista.removeIf(a -> a.getCodigo().equals(codigo));
-        guardarTodas(lista); 
-        
-        return true; // Éxito al eliminar
-    }
+        // removeIf devuelve true si eliminó algo, false si no lo encontró
+        boolean eliminado = lista.removeIf(a -> a.getCodigo().equals(codigo));
 
-    // 5. Si no se encontró el aula original
-    return false;
-}   
+        if (eliminado) {
+            guardarTodas(lista);
+        }
+        return eliminado;
+    }
 
 }

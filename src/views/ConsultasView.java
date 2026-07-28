@@ -2,6 +2,7 @@ package views;
 
 import utils.Validaciones;
 import java.util.Scanner;
+import utils.Mostrar;
 
 public class ConsultasView {
 
@@ -13,7 +14,7 @@ public class ConsultasView {
                 + "2. Estudiantes a cargo de un profesor\n"
                 + "3. Profesor asignado a un estudiante\n"
                 + "0. Volver al menu principal";
-        return Validaciones.mostrarMenu(textoMenu, scanner);
+        return Mostrar.Menu(textoMenu, scanner);
     }
 
     public String pedirIdProfesor() {

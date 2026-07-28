@@ -4,7 +4,6 @@ import models.Aula;
 import models.Estudiante;
 import models.Profesor;
 import java.util.List;
-import java.util.Scanner;
 import models.Asignacion;
 import models.Inscripcion;
 
@@ -83,14 +82,6 @@ public class Validaciones {
         return !texto.trim().isEmpty();
     }
 
-    // Imprime un menu multilinea y devuelve la opcion elegida
-    public static int mostrarMenu(String mensajeMenu, Scanner scanner) {
-        System.out.println(mensajeMenu);
-        System.out.print("Opcion: ");
-        int opcion = scanner.nextInt();
-        scanner.nextLine(); // Limpiar el buffer del teclado
-        return opcion;
-    }
 
     // Valida que el texto ingresado sea un numero entero mayor a 0
     public static boolean esNumeroPositivo(String texto) {
