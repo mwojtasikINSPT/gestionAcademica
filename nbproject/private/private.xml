@@ -3,12 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/santo/Desktop/Programacion%20II/GestionAcademica/src/daos/InscripcionDAO.java</file>
             <file>file:/C:/Users/santo/Desktop/Programacion%20II/GestionAcademica/src/controllers/InscripcionController.java</file>
-            <file>file:/C:/Users/santo/Desktop/Programacion%20II/GestionAcademica/src/controllers/AulaController.java</file>
+            <file>file:/C:/Users/santo/Desktop/Programacion%20II/GestionAcademica/src/views/ConsultasView.java</file>
             <file>file:/C:/Users/santo/Desktop/Programacion%20II/GestionAcademica/src/gestionacademica/AppConfig.java</file>
-            <file>file:/C:/Users/santo/Desktop/Programacion%20II/GestionAcademica/src/views/MainView.java</file>
-            <file>file:/C:/Users/santo/Desktop/Programacion%20II/GestionAcademica/src/views/InscripcionView.java</file>
+            <file>file:/C:/Users/santo/Desktop/Programacion%20II/GestionAcademica/src/controllers/ConsultasController.java</file>
         </group>
     </open-files>
 </project-private>
